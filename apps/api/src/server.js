@@ -62,6 +62,12 @@ const riderLocationSchema = z.object({
   currentLng: z.number().finite(),
 });
 
+function normalizePhone(phone) {
+  return String(phone || "")
+    .trim()
+    .replace(/[\s()-]+/g, "");
+}
+
 function tokenFor(account) {
   return jwt.sign({ sub: account.id, phone: account.phone, role: account.role }, config.jwtSecret, { expiresIn: "30d" });
 }
@@ -266,13 +272,14 @@ app.post("/auth/signup", async (req, res) => {
   const parsed = signupSchema.safeParse(req.body);
   if (!parsed.success) return sendValidationError(res, parsed.error);
 
-  const existing = await store.findUserByPhone(parsed.data.phone);
+  const phone = normalizePhone(parsed.data.phone);
+  const existing = await store.findUserByPhone(phone);
   if (existing) {
     return res.status(409).json({ error: "phone_already_registered" });
   }
 
   const passwordHash = await bcrypt.hash(parsed.data.password, 10);
-  const user = await store.createUser({ ...parsed.data, passwordHash });
+  const user = await store.createUser({ ...parsed.data, phone, passwordHash });
   return res.status(201).json({ user, token: tokenFor(user) });
 });
 
@@ -280,7 +287,8 @@ app.post("/auth/login", async (req, res) => {
   const parsed = loginSchema.safeParse(req.body);
   if (!parsed.success) return sendValidationError(res, parsed.error);
 
-  const customer = await store.findUserByPhone(parsed.data.phone);
+  const phone = normalizePhone(parsed.data.phone);
+  const customer = await store.findUserByPhone(phone);
   if (customer) {
     const isValid = await bcrypt.compare(parsed.data.password, customer.passwordHash);
     if (!isValid) {
@@ -291,7 +299,7 @@ app.post("/auth/login", async (req, res) => {
     return res.json({ user, token: tokenFor(user) });
   }
 
-  const rider = await store.findCourierByPhone(parsed.data.phone);
+  const rider = await store.findCourierByPhone(phone);
   if (rider) {
     const isValid = await bcrypt.compare(parsed.data.password, rider.passwordHash);
     if (!isValid) {

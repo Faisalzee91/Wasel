@@ -67,7 +67,7 @@ export default function App() {
     event.preventDefault();
     try {
       setError("");
-      await login(phone, password, adminKey);
+      await login(phone.trim(), password, adminKey.trim());
       setAuthenticated(true);
     } catch {
       setError("The login details are not correct.");

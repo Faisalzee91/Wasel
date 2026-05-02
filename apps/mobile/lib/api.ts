@@ -125,7 +125,11 @@ export async function apiRequest<T>(path: string, options: RequestInit = {}): Pr
 export async function signup(input: { name: string; phone: string; password: string }) {
   const payload = await apiRequest<{ token: string; user: User }>("/auth/signup", {
     method: "POST",
-    body: JSON.stringify(input),
+    body: JSON.stringify({
+      ...input,
+      name: input.name.trim(),
+      phone: input.phone.trim(),
+    }),
   });
   await setToken(payload.token);
   await saveUser(payload.user);
@@ -135,7 +139,10 @@ export async function signup(input: { name: string; phone: string; password: str
 export async function login(input: { phone: string; password: string }) {
   const payload = await apiRequest<{ token: string; user: User }>("/auth/login", {
     method: "POST",
-    body: JSON.stringify(input),
+    body: JSON.stringify({
+      ...input,
+      phone: input.phone.trim(),
+    }),
   });
   await setToken(payload.token);
   await saveUser(payload.user);
