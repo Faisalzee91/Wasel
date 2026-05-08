@@ -705,7 +705,7 @@ app.post("/orders/:id/payment/stripe/initiate", authenticate, requireCustomer, a
   }
 });
 
-app.get("/stripe/callback", async (req, res) => {
+app.get("/stripe/callback", (req, res) => {
   const { session_id, orderId, result } = req.query;
 
   if (result === "cancel" || !orderId) {
@@ -716,23 +716,35 @@ app.get("/stripe/callback", async (req, res) => {
     return res.redirect(`wasel://payment/result?paid=false&orderId=${orderId}&reason=MISSING_SESSION`);
   }
 
+  // Redirect immediately — mobile verifies and finalises via /stripe/confirm
+  return res.redirect(`wasel://payment/result?session_id=${session_id}&orderId=${orderId}`);
+});
+
+app.post("/orders/:id/payment/stripe/confirm", authenticate, requireCustomer, async (req, res) => {
+  const { sessionId } = req.body;
+  if (!sessionId) return res.status(400).json({ error: "missing_session_id" });
+
+  const order = await store.getOrderById(req.params.id);
+  if (!order || order.userId !== req.user.id) {
+    return res.status(404).json({ error: "order_not_found" });
+  }
+
   try {
     const stripe = getStripe();
-    const session = await stripe.checkout.sessions.retrieve(session_id);
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
 
     if (session.payment_status === "paid") {
-      const order = await store.getOrderById(orderId);
-      if (order && order.status === "pending") {
-        await store.updateOrder(orderId, { paymentMethod: "card", status: "pending" });
+      if (order.status === "pending") {
+        await store.updateOrder(req.params.id, { paymentMethod: "stcpay", status: "pending" });
         await matchOrderToNearbyRiders(order);
       }
-      return res.redirect(`wasel://payment/result?paid=true&orderId=${orderId}`);
+      return res.json({ paid: true });
     }
 
-    return res.redirect(`wasel://payment/result?paid=false&orderId=${orderId}&reason=DECLINED`);
+    return res.json({ paid: false, reason: "DECLINED" });
   } catch (error) {
-    console.error("[Stripe] callback error", error);
-    return res.redirect(`wasel://payment/result?paid=false&orderId=${orderId}&reason=ERROR`);
+    console.error("[Stripe] confirm error", error);
+    return res.status(502).json({ error: "stripe_confirm_failed" });
   }
 });
 

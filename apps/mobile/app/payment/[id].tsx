@@ -46,21 +46,38 @@ export default function PaymentScreen() {
         return;
       }
 
-      const redirectUrl = Linking.createURL("payment/result");
       const result = await WebBrowser.openAuthSessionAsync(payload.paymentUrl, "wasel://");
 
       if (result.type === "success" && result.url) {
         const parsed = Linking.parse(result.url);
-        const paid = parsed.queryParams?.paid === "true";
+        const reason = parsed.queryParams?.reason as string | undefined;
+
+        // Explicit cancel from Stripe cancel_url
+        if (reason === "CANCELLED") {
+          setError(t("paymentCancelled"));
+          return;
+        }
+
+        const sessionId = parsed.queryParams?.session_id as string | undefined;
         const returnedOrderId = parsed.queryParams?.orderId as string | undefined;
 
-        if (paid) {
+        if (!sessionId) {
+          setError(t("paymentFailed"));
+          return;
+        }
+
+        // Verify payment with backend
+        const confirm = await apiRequest<{ paid: boolean; reason?: string }>(
+          `/orders/${returnedOrderId || id}/payment/stripe/confirm`,
+          { method: "POST", body: JSON.stringify({ sessionId }) },
+        );
+
+        if (confirm.paid) {
           router.replace(`/order/${returnedOrderId || id}`);
           return;
         }
 
-        const reason = parsed.queryParams?.reason as string | undefined;
-        setError(reason === "DECLINED" ? t("paymentDeclined") : t("paymentFailed"));
+        setError(confirm.reason === "DECLINED" ? t("paymentDeclined") : t("paymentFailed"));
         return;
       }
 
