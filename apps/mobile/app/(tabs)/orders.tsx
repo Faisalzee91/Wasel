@@ -1,5 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { router, useFocusEffect } from "expo-router";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Animated, Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -43,10 +43,20 @@ function getStatusTone(status: Order["status"]) {
 
 export default function OrdersScreen() {
   const { isRtl, t } = useLanguage();
+  const { filter: filterParam } = useLocalSearchParams<{ filter?: string }>();
   const [user, setUser] = useState<User | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
-  const [filter, setFilter] = useState<FilterKey>("all");
+  const [filter, setFilter] = useState<FilterKey>(() => {
+    if (filterParam === "delivered") return "delivered";
+    if (filterParam === "pending") return "pending";
+    return "all";
+  });
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (filterParam === "delivered") setFilter("delivered");
+    else if (filterParam === "pending") setFilter("pending");
+  }, [filterParam]);
 
   useFocusEffect(
     useCallback(() => {

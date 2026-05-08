@@ -1,7 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Alert, Animated, Easing, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Alert, Animated, Easing, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { login, requestPasswordResetOtp, resetPasswordWithOtp, signup } from "../lib/api";
 import { useLanguage } from "../lib/i18n";
 import { colors, spacing } from "../lib/theme";
@@ -282,7 +282,10 @@ export default function AuthScreen() {
                 pressed && { opacity: 0.88 },
               ]}
             >
-              <Text style={{ color: colors.white, fontSize: 16, fontWeight: "800" }}>{loading ? "..." : submitLabel}</Text>
+              {loading
+                ? <ActivityIndicator size="small" color={colors.white} />
+                : <Text style={{ color: colors.white, fontSize: 16, fontWeight: "800" }}>{submitLabel}</Text>
+              }
             </Pressable>
 
             <Text style={{ color: "#96A096", fontSize: 14, lineHeight: 22, textAlign: "center" }}>{t("termsAgreement")}</Text>

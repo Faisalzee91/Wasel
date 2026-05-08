@@ -570,32 +570,32 @@ export default function HomeScreen() {
 
         <View style={{ flexDirection: isRtl ? "row-reverse" : "row", gap: spacing.sm }}>
           {[
-            { label: t("activeOrders"), value: activeOrders.length, tone: colors.warning },
-            { label: t("deliveredOrders"), value: deliveredOrders.length, tone: colors.secondary },
-            { label: t("totalValue"), value: totalValue, tone: colors.primary, suffix: t("sar") },
+            { label: t("activeOrders"), value: activeOrders.length, tone: colors.warning, filter: "pending" },
+            { label: t("deliveredOrders"), value: deliveredOrders.length, tone: colors.secondary, filter: "delivered" },
           ].map((stat) => (
-            <View
+            <Pressable
               key={stat.label}
-              style={{
-                flex: 1,
-                minHeight: 88,
-                backgroundColor: "#FBF5E7",
-                borderRadius: 18,
-                borderWidth: 1,
-                borderColor: "#D8CCAE",
-                paddingHorizontal: 10,
-                paddingVertical: 12,
-                justifyContent: "center",
-                alignItems: "center",
-                gap: spacing.xs,
-              }}
+              onPress={() => router.push(`/(tabs)/orders?filter=${stat.filter}`)}
+              style={({ pressed }) => [
+                {
+                  flex: 1,
+                  minHeight: 88,
+                  backgroundColor: "#FBF5E7",
+                  borderRadius: 18,
+                  borderWidth: 1,
+                  borderColor: "#D8CCAE",
+                  paddingHorizontal: 10,
+                  paddingVertical: 12,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: spacing.xs,
+                },
+                pressed && { opacity: 0.72 },
+              ]}
             >
-              <Text style={{ color: stat.tone, fontSize: 20, fontWeight: "800", textAlign: "center" }}>
-                {stat.value}
-                {stat.suffix ? ` ${stat.suffix}` : ""}
-              </Text>
+              <Text style={{ color: stat.tone, fontSize: 20, fontWeight: "800", textAlign: "center" }}>{stat.value}</Text>
               <Text style={{ color: colors.gray, fontSize: 12, fontWeight: "600", textAlign: "center" }}>{stat.label}</Text>
-            </View>
+            </Pressable>
           ))}
         </View>
 
