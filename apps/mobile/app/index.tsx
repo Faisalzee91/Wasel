@@ -1,4 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { WaselLogo } from "../components/WaselLogo";
 import { router } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, Alert, Animated, Easing, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Text, TextInput, View } from "react-native";
@@ -180,23 +181,7 @@ export default function AuthScreen() {
           }}
         >
           <View style={{ alignItems: "center", gap: spacing.md }}>
-            <View
-              style={{
-                width: 86,
-                height: 86,
-                borderRadius: 24,
-                backgroundColor: colors.primary,
-                alignItems: "center",
-                justifyContent: "center",
-                shadowColor: colors.primary,
-                shadowOpacity: 0.18,
-                shadowRadius: 14,
-                shadowOffset: { width: 0, height: 8 },
-              }}
-            >
-              <Ionicons name="navigate" size={36} color={colors.white} />
-            </View>
-            <Text style={{ color: colors.primary, fontSize: 42, fontWeight: "800", letterSpacing: 0 }}>Wasel</Text>
+            <WaselLogo iconSize={56} layout="stacked" />
             <Text
               style={{
                 color: "#586A61",
@@ -313,20 +298,8 @@ export default function AuthScreen() {
           }}
         >
           <Animated.View style={{ alignItems: "center", gap: 18, transform: [{ scale: logoScale }] }}>
-            <View
-              style={{
-                width: 106,
-                height: 106,
-                borderRadius: 30,
-                backgroundColor: "rgba(255,255,255,0.1)",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Ionicons name="navigate" size={48} color={colors.white} />
-            </View>
-            <Animated.View style={{ alignItems: "center", gap: 10, opacity: copyOpacity }}>
-              <Text style={{ color: colors.white, fontSize: 44, fontWeight: "800", letterSpacing: 0 }}>Wasel</Text>
+            <WaselLogo iconSize={72} layout="stacked" inverted />
+            <Animated.View style={{ alignItems: "center", gap: 6, opacity: copyOpacity }}>
               <Text style={{ color: "rgba(255,255,255,0.9)", fontSize: 17, fontWeight: "600" }}>{t("deliverAnywhere")}</Text>
             </Animated.View>
           </Animated.View>
