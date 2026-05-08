@@ -16,7 +16,7 @@ const store = createStore(config.databaseUrl);
 const MATCH_RADIUS_KM = 10;
 const MAX_RIDER_NOTIFICATIONS = 6;
 const ORDER_STATUSES = ["pending", "confirmed", "assigned", "delivered", "canceled"];
-const PAYMENT_METHODS = ["stcpay", "bank_transfer", "apple_pay"];
+const PAYMENT_METHODS = ["stcpay", "bank_transfer", "apple_pay", "card"];
 
 const isTest = process.env.NODE_ENV === "test";
 
@@ -735,7 +735,7 @@ app.post("/orders/:id/payment/stripe/confirm", authenticate, requireCustomer, as
 
     if (session.payment_status === "paid") {
       if (order.status === "pending") {
-        await store.updateOrder(req.params.id, { paymentMethod: "stcpay", status: "pending" });
+        await store.updateOrder(req.params.id, { paymentMethod: "card", status: "pending" });
         await matchOrderToNearbyRiders(order);
       }
       return res.json({ paid: true });
