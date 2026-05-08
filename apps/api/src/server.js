@@ -511,6 +511,18 @@ app.post("/orders/:id/payment", authenticate, requireCustomer, async (req, res) 
 app.post("/orders/:id/accept", authenticate, requireRider, async (req, res) => {
   try {
     const order = await store.acceptOrder(req.params.id, req.user.id);
+
+    // Notify customer their order was accepted
+    const customer = await store.getUserById(order.userId);
+    if (customer?.pushToken) {
+      sendExpoPush({
+        token: customer.pushToken,
+        title: "🛵 Rider accepted your order",
+        body: `${req.user.name} is on the way to pick up your package`,
+        data: { orderId: order.id, type: "accepted" },
+      }).catch(() => {});
+    }
+
     return res.json({ order });
   } catch (error) {
     return sendStoreError(res, error);
@@ -551,6 +563,18 @@ app.post("/orders/:id/delivered", authenticate, requireRider, async (req, res) =
 
   try {
     const order = await store.markOrderDeliveredWithOtp(req.params.id, req.user.id, parsed.data.otp);
+
+    // Notify customer delivery confirmed
+    const customer = await store.getUserById(order.userId);
+    if (customer?.pushToken) {
+      sendExpoPush({
+        token: customer.pushToken,
+        title: "✅ Package delivered",
+        body: `Your order ${getOrderRef(order.id)} has been delivered successfully`,
+        data: { orderId: order.id, type: "delivered" },
+      }).catch(() => {});
+    }
+
     return res.json({ order });
   } catch (error) {
     return sendStoreError(res, error);
@@ -634,6 +658,9 @@ app.patch("/rider/availability", authenticate, requireRider, async (req, res) =>
   return res.json({ rider: courier });
 });
 
+// Track last push time per rider to throttle notifications (every 60s max)
+const lastTrackingPush = new Map();
+
 app.patch("/rider/location", authenticate, requireRider, async (req, res) => {
   const parsed = riderLocationSchema.safeParse(req.body);
   if (!parsed.success) return sendValidationError(res, parsed.error);
@@ -647,8 +674,54 @@ app.patch("/rider/location", authenticate, requireRider, async (req, res) => {
     await retryPendingMatches();
   }
 
+  // Send tracking push to customer — throttled to once per 60 seconds
+  if (courier?.activeOrderId) {
+    const now = Date.now();
+    const last = lastTrackingPush.get(req.user.id) || 0;
+    if (now - last > 60_000) {
+      lastTrackingPush.set(req.user.id, now);
+      const order = await store.getOrderById(courier.activeOrderId);
+      notifyCustomerTracking(order, parsed.data.currentLat, parsed.data.currentLng).catch(() => {});
+    }
+  }
+
   return res.json({ rider: courier });
 });
+
+// ── Push Notifications ────────────────────────────────────────────────────────
+
+async function sendExpoPush({ token, title, body, data = {} }) {
+  if (!token || !token.startsWith("ExponentPushToken")) return;
+  try {
+    await fetch("https://exp.host/--/api/v2/push/send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({ to: token, title, body, data, channelId: "tracking" }),
+    });
+  } catch (err) {
+    console.error("[Push] send failed", err?.message);
+  }
+}
+
+async function notifyCustomerTracking(order, riderLat, riderLng) {
+  if (!order || order.status !== "assigned") return;
+
+  const customer = await store.getUserById(order.userId);
+  if (!customer?.pushToken) return;
+
+  const distKm = calculateDistanceKm(riderLat, riderLng, order.pickupLat, order.pickupLng);
+  if (distKm === null) return;
+
+  const distLabel = distKm < 1 ? `${Math.round(distKm * 1000)} m` : `${distKm.toFixed(1)} km`;
+  const etaMin = Math.max(1, Math.round((distKm / 30) * 60)); // ~30 km/h urban
+
+  await sendExpoPush({
+    token: customer.pushToken,
+    title: "🛵 Rider on the way",
+    body: `${distLabel} away — ~${etaMin} min to pickup`,
+    data: { orderId: order.id, type: "tracking" },
+  });
+}
 
 // ── Stripe Payments ───────────────────────────────────────────────────────────
 
