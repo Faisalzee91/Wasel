@@ -1,6 +1,6 @@
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useCallback, useState } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { Card, Pill, Screen, SecondaryButton, Title } from "../../components/ui";
 import { apiRequest, fetchCurrentUser, Order, User } from "../../lib/api";
 import { useLanguage } from "../../lib/i18n";
@@ -27,6 +27,7 @@ export default function OrderDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [order, setOrder] = useState<Order | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const [canceling, setCanceling] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -63,6 +64,29 @@ export default function OrderDetailScreen() {
       };
     }, [id]),
   );
+
+  function confirmCancel() {
+    Alert.alert(t("cancelOrderConfirm"), t("cancelOrderConfirmBody"), [
+      { text: t("cancel"), style: "cancel" },
+      {
+        text: t("cancelOrder"),
+        style: "destructive",
+        onPress: async () => {
+          if (!id) return;
+          try {
+            setCanceling(true);
+            const payload = await apiRequest<{ order: Order }>(`/orders/${id}/cancel`, { method: "POST" });
+            setOrder(payload.order);
+            Alert.alert(t("appName"), t("cancelOrderSuccess"));
+          } catch {
+            Alert.alert(t("appName"), t("cancelOrderError"));
+          } finally {
+            setCanceling(false);
+          }
+        },
+      },
+    ]);
+  }
 
   return (
     <Screen>
@@ -197,6 +221,29 @@ export default function OrderDetailScreen() {
                 </Text>
               )}
             </Card>
+
+            {user?.role === "customer" && order.status === "pending" ? (
+              <Pressable
+                disabled={canceling}
+                onPress={confirmCancel}
+                style={({ pressed }) => [
+                  {
+                    minHeight: 52,
+                    borderRadius: 16,
+                    borderWidth: 1.5,
+                    borderColor: "#C0392B",
+                    backgroundColor: "#FDF3F2",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  },
+                  pressed && { opacity: 0.8 },
+                ]}
+              >
+                <Text style={{ color: "#C0392B", fontSize: 16, fontWeight: "800" }}>
+                  {canceling ? "..." : t("cancelOrder")}
+                </Text>
+              </Pressable>
+            ) : null}
 
             <View style={{ flexDirection: isRtl ? "row-reverse" : "row", gap: spacing.sm }}>
               <View style={{ flex: 1 }}>

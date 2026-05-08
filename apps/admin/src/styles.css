@@ -224,6 +224,72 @@ dd {
   text-align: center;
 }
 
+.couriers-section {
+  margin-bottom: 28px;
+}
+
+.section-heading {
+  color: var(--primary);
+  font-size: 20px;
+  margin: 0 0 4px;
+}
+
+.section-note {
+  color: var(--gray);
+  font-size: 13px;
+  margin: 0 0 12px;
+}
+
+.couriers-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: 14px;
+}
+
+.couriers-table th,
+.couriers-table td {
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+}
+
+.couriers-table th {
+  color: var(--gray);
+  font-size: 13px;
+  font-weight: 600;
+  background: #f7f3ee;
+}
+
+.couriers-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.couriers-table tr:hover td {
+  background: #faf7f2;
+}
+
+.availability-badge {
+  display: inline-flex;
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.availability-badge.available {
+  background: #e7f2ef;
+  color: var(--primary);
+}
+
+.availability-badge.offline {
+  background: #f0eeeb;
+  color: var(--gray);
+}
+
 @media (max-width: 760px) {
   .dashboard {
     padding: 16px;

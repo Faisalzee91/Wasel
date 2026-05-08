@@ -1,4 +1,5 @@
 import * as Location from "expo-location";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { Alert, Pressable, ScrollView, Text, View } from "react-native";
@@ -266,7 +267,29 @@ export default function BookingScreen() {
   return (
     <Screen>
       <ScrollView contentContainerStyle={{ gap: spacing.md, paddingBottom: spacing.xl }} showsVerticalScrollIndicator={false}>
-        <Title>{t("bookingTitle")}</Title>
+        <View style={{ flexDirection: isRtl ? "row-reverse" : "row", alignItems: "center", gap: spacing.sm }}>
+          <Pressable
+            onPress={() => router.back()}
+            style={({ pressed }) => [
+              {
+                width: 40,
+                height: 40,
+                borderRadius: 20,
+                borderWidth: 1,
+                borderColor: colors.line,
+                backgroundColor: colors.white,
+                alignItems: "center",
+                justifyContent: "center",
+              },
+              pressed && { opacity: 0.82 },
+            ]}
+          >
+            <Ionicons name={isRtl ? "chevron-forward" : "chevron-back"} size={20} color={colors.primary} />
+          </Pressable>
+          <View style={{ flex: 1 }}>
+            <Title>{t("bookingTitle")}</Title>
+          </View>
+        </View>
 
         <Card>
           <View style={{ gap: spacing.sm }}>

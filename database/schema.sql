@@ -6,14 +6,16 @@ create table if not exists users (
   phone text not null unique,
   password_hash text not null,
   push_token text,
+  password_reset_otp_hash text,
+  password_reset_otp_expires_at timestamptz,
+  password_reset_otp_sent_at timestamptz,
   created_at timestamptz not null default now()
 );
 
-alter table users add column if not exists name text;
-alter table users add column if not exists phone text;
-alter table users add column if not exists password_hash text;
-alter table users add column if not exists push_token text;
-alter table users add column if not exists created_at timestamptz not null default now();
+-- OTP columns added after initial deploy
+alter table users add column if not exists password_reset_otp_hash text;
+alter table users add column if not exists password_reset_otp_expires_at timestamptz;
+alter table users add column if not exists password_reset_otp_sent_at timestamptz;
 
 create table if not exists couriers (
   id uuid primary key default gen_random_uuid(),
@@ -24,17 +26,12 @@ create table if not exists couriers (
   current_lat double precision,
   current_lng double precision,
   active_order_id uuid,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
 );
 
-alter table couriers add column if not exists name text;
-alter table couriers add column if not exists phone text;
-alter table couriers add column if not exists password_hash text;
-alter table couriers add column if not exists is_available boolean not null default true;
-alter table couriers add column if not exists current_lat double precision;
-alter table couriers add column if not exists current_lng double precision;
-alter table couriers add column if not exists active_order_id uuid;
-alter table couriers add column if not exists created_at timestamptz not null default now();
+-- updated_at added after initial deploy
+alter table couriers add column if not exists updated_at timestamptz not null default now();
 
 create table if not exists orders (
   id uuid primary key default gen_random_uuid(),
@@ -56,6 +53,9 @@ create table if not exists orders (
   price integer not null check (price > 0),
   status text not null default 'pending',
   courier_id uuid references couriers(id) on delete set null,
+  delivery_otp_hash text,
+  delivery_otp_expires_at timestamptz,
+  delivery_otp_sent_at timestamptz,
   delivered_at timestamptz,
   estimated_delivery_minutes integer not null default 90,
   created_at timestamptz not null default now(),
@@ -66,6 +66,7 @@ create table if not exists orders (
   constraint orders_payment_method_check check (payment_method in ('stcpay', 'bank_transfer', 'apple_pay'))
 );
 
+-- columns added after initial deploy
 alter table orders add column if not exists pickup_lat double precision;
 alter table orders add column if not exists pickup_lng double precision;
 alter table orders add column if not exists dropoff_lat double precision;
@@ -75,9 +76,13 @@ alter table orders add column if not exists recipient_phone text;
 alter table orders add column if not exists item_count integer not null default 1;
 alter table orders add column if not exists distance_km numeric(10,2);
 alter table orders add column if not exists courier_id uuid;
+alter table orders add column if not exists delivery_otp_hash text;
+alter table orders add column if not exists delivery_otp_expires_at timestamptz;
+alter table orders add column if not exists delivery_otp_sent_at timestamptz;
 alter table orders add column if not exists delivered_at timestamptz;
 alter table orders add column if not exists estimated_delivery_minutes integer not null default 90;
 alter table orders add column if not exists updated_at timestamptz not null default now();
+alter table orders add column if not exists canceled_at timestamptz;
 
 alter table couriers
   drop constraint if exists couriers_active_order_id_fkey;
@@ -100,6 +105,7 @@ create table if not exists order_matches (
   constraint order_matches_state_check check (state in ('pending', 'accepted', 'rejected', 'expired'))
 );
 
+-- columns added after initial deploy
 alter table order_matches add column if not exists distance_to_pickup_km numeric(10,2);
 alter table order_matches add column if not exists state text not null default 'pending';
 alter table order_matches add column if not exists updated_at timestamptz not null default now();
@@ -110,6 +116,8 @@ create index if not exists orders_courier_id_idx on orders(courier_id);
 create index if not exists order_matches_courier_state_idx on order_matches(courier_id, state, created_at desc);
 create index if not exists order_matches_order_state_idx on order_matches(order_id, state);
 create index if not exists couriers_available_idx on couriers(is_available, active_order_id);
+create index if not exists users_phone_idx on users(phone);
+create index if not exists couriers_phone_idx on couriers(phone);
 
 create or replace function set_updated_at()
 returns trigger as $$
@@ -130,3 +138,8 @@ create trigger order_matches_set_updated_at
 before update on order_matches
 for each row
 execute function set_updated_at();
+
+drop trigger if exists couriers_set_updated_at on couriers;
+create trigger couriers_set_updated_at
+before update on couriers
+for each row execute function set_updated_at();

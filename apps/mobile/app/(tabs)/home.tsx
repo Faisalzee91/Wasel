@@ -1,14 +1,63 @@
 import * as Location from "expo-location";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { router, useFocusEffect } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
-import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Alert, Animated, Modal, Pressable, ScrollView, Text, View } from "react-native";
 import { apiRequest, fetchCurrentUser, Order, RiderRequest, User } from "../../lib/api";
-import { Card, Pill, PrimaryButton, Screen, SecondaryButton, Title } from "../../components/ui";
-import { colors, spacing } from "../../lib/theme";
+import { Card, Field, Label, Pill, PrimaryButton, Screen, SecondaryButton, Title } from "../../components/ui";
+import { colors, radius, spacing } from "../../lib/theme";
 import { useLanguage } from "../../lib/i18n";
 
 function formatKm(value: number) {
   return `${value.toFixed(1)}`;
+}
+
+function getGreetingKey() {
+  const hour = new Date().getHours();
+  if (hour < 12) return "greetingMorning";
+  if (hour < 18) return "greetingAfternoon";
+  return "greetingEvening";
+}
+
+function getOrderReference(id: string) {
+  return `WSL-${id.replace(/-/g, "").slice(-4).toUpperCase()}`;
+}
+
+function formatCompactAddress(address: string) {
+  const [first, second] = address.split(",");
+  return [first, second].filter(Boolean).join(", ").trim();
+}
+
+function getStatusPalette(status: Order["status"]) {
+  if (status === "delivered") {
+    return {
+      backgroundColor: "#E7F6EF",
+      dotColor: colors.success,
+      textColor: colors.success,
+    };
+  }
+
+  if (status === "assigned") {
+    return {
+      backgroundColor: "#E9F5F2",
+      dotColor: colors.secondary,
+      textColor: colors.primary,
+    };
+  }
+
+  if (status === "pending" || status === "confirmed") {
+    return {
+      backgroundColor: "#F8EEE0",
+      dotColor: colors.warning,
+      textColor: colors.warning,
+    };
+  }
+
+  return {
+    backgroundColor: "#EFEAF8",
+    dotColor: "#7C55BE",
+    textColor: "#7C55BE",
+  };
 }
 
 export default function HomeScreen() {
@@ -17,6 +66,12 @@ export default function HomeScreen() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [requests, setRequests] = useState<RiderRequest[]>([]);
   const [currentDelivery, setCurrentDelivery] = useState<Order | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [otpVisible, setOtpVisible] = useState(false);
+  const [otpCode, setOtpCode] = useState("");
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [otpSubmitting, setOtpSubmitting] = useState(false);
+  const [otpRecipientPhone, setOtpRecipientPhone] = useState("");
 
   useEffect(() => {
     if (user?.role !== "rider" || !user.isAvailable) {
@@ -100,6 +155,8 @@ export default function HomeScreen() {
           setOrders([]);
           setRequests([]);
           setCurrentDelivery(null);
+        } finally {
+          if (active) setLoading(false);
         }
       }
 
@@ -141,9 +198,32 @@ export default function HomeScreen() {
     }
   }
 
-  async function markDelivered(orderId: string) {
+  async function requestDeliveryOtp(order: Order) {
     try {
-      await apiRequest(`/orders/${orderId}/delivered`, { method: "POST" });
+      setOtpLoading(true);
+      const payload = await apiRequest<{ ok: boolean; recipientPhone: string }>(`/orders/${order.id}/delivery-otp`, {
+        method: "POST",
+      });
+      setOtpRecipientPhone(payload.recipientPhone || order.recipientPhone || "");
+      setOtpCode("");
+      setOtpVisible(true);
+      Alert.alert(t("appName"), `${t("deliveryOtpSent")}${payload.recipientPhone ? `: ${payload.recipientPhone}` : ""}`);
+    } catch (error) {
+      Alert.alert(t("appName"), error instanceof Error ? error.message : t("otpRequired"));
+    } finally {
+      setOtpLoading(false);
+    }
+  }
+
+  async function markDelivered(orderId: string) {
+    if (!otpCode.trim()) {
+      Alert.alert(t("appName"), t("otpRequired"));
+      return;
+    }
+
+    try {
+      setOtpSubmitting(true);
+      await apiRequest(`/orders/${orderId}/delivered`, { method: "POST", body: JSON.stringify({ otp: otpCode.trim() }) });
       const [account, requestsPayload, currentPayload] = await Promise.all([
         fetchCurrentUser(),
         apiRequest<{ requests: RiderRequest[] }>("/rider/available-requests"),
@@ -152,8 +232,20 @@ export default function HomeScreen() {
       setUser(account);
       setRequests(requestsPayload.requests);
       setCurrentDelivery(currentPayload.order);
+      setOtpVisible(false);
+      setOtpCode("");
+      setOtpRecipientPhone("");
     } catch (error) {
-      Alert.alert(t("appName"), error instanceof Error ? error.message : "Delivery could not be completed.");
+      const code = (error as Error & { code?: string })?.code;
+      if (code === "delivery_otp_invalid") {
+        Alert.alert(t("appName"), t("invalidDeliveryOtp"));
+      } else if (code === "delivery_otp_expired") {
+        Alert.alert(t("appName"), t("expiredDeliveryOtp"));
+      } else {
+        Alert.alert(t("appName"), error instanceof Error ? error.message : "Delivery could not be completed.");
+      }
+    } finally {
+      setOtpSubmitting(false);
     }
   }
 
@@ -229,7 +321,7 @@ export default function HomeScreen() {
               <Text style={{ color: colors.gray, lineHeight: 22, textAlign: isRtl ? "right" : "left" }}>
                 {t("pickupDestinationNote")}
               </Text>
-              <PrimaryButton onPress={() => markDelivered(currentDelivery.id)}>{t("markDelivered")}</PrimaryButton>
+              <PrimaryButton loading={otpLoading} onPress={() => requestDeliveryOtp(currentDelivery)}>{t("markDelivered")}</PrimaryButton>
             </Card>
           ) : (
             <Card>
@@ -296,49 +388,357 @@ export default function HomeScreen() {
             ))
           )}
         </ScrollView>
+        <Modal visible={otpVisible} transparent animationType="fade" onRequestClose={() => setOtpVisible(false)}>
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: "rgba(24, 29, 34, 0.4)",
+              justifyContent: "center",
+              padding: spacing.md,
+            }}
+          >
+            <View
+              style={{
+                backgroundColor: colors.white,
+                borderRadius: 8,
+                borderColor: colors.line,
+                borderWidth: 1,
+                padding: spacing.md,
+                gap: spacing.sm,
+              }}
+            >
+              <Text style={{ color: colors.primary, fontSize: 20, fontWeight: "800", textAlign: isRtl ? "right" : "left" }}>
+                {t("deliveryOtpTitle")}
+              </Text>
+              <Text style={{ color: colors.gray, lineHeight: 22, textAlign: isRtl ? "right" : "left" }}>
+                {t("deliveryOtpBody")}
+              </Text>
+              {otpRecipientPhone ? (
+                <Text style={{ color: colors.charcoal, fontWeight: "700", textAlign: isRtl ? "right" : "left" }}>
+                  {otpRecipientPhone}
+                </Text>
+              ) : null}
+              <Label>{t("deliveryOtpField")}</Label>
+              <Field
+                value={otpCode}
+                onChangeText={setOtpCode}
+                placeholder={t("deliveryOtpHint")}
+                keyboardType="number-pad"
+                autoCapitalize="none"
+                autoCorrect={false}
+                maxLength={8}
+              />
+              <View style={{ flexDirection: isRtl ? "row-reverse" : "row", gap: spacing.sm }}>
+                <View style={{ flex: 1 }}>
+                  <PrimaryButton loading={otpSubmitting} onPress={() => currentDelivery && markDelivered(currentDelivery.id)}>
+                    {t("confirmDeliveryOtp")}
+                  </PrimaryButton>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <SecondaryButton onPress={() => currentDelivery && requestDeliveryOtp(currentDelivery)}>
+                    {t("resendOtp")}
+                  </SecondaryButton>
+                </View>
+              </View>
+              <SecondaryButton
+                onPress={() => {
+                  setOtpVisible(false);
+                  setOtpCode("");
+                }}
+              >
+                {t("cancel")}
+              </SecondaryButton>
+            </View>
+          </View>
+        </Modal>
       </Screen>
     );
   }
 
+  const activeOrders = orders.filter((item) => item.status === "pending" || item.status === "confirmed" || item.status === "assigned");
+  const deliveredOrders = orders.filter((item) => item.status === "delivered");
+  const totalValue = orders.reduce((sum, item) => sum + item.price, 0);
+  const recentOrders = orders.slice(0, 6);
+
   return (
     <Screen>
-      <ScrollView contentContainerStyle={{ gap: spacing.md, paddingBottom: spacing.xl }} showsVerticalScrollIndicator={false}>
-        <View style={{ gap: spacing.sm }}>
-          <Title>{t("homeTitle")}</Title>
-          <Text style={{ color: colors.gray, fontSize: 15, lineHeight: 23, textAlign: isRtl ? "right" : "left" }}>
-            {t("homeSubtitle")}
-          </Text>
+      <ScrollView contentContainerStyle={{ gap: spacing.md, paddingBottom: spacing.lg }} showsVerticalScrollIndicator={false}>
+        <View
+          style={{
+            flexDirection: isRtl ? "row-reverse" : "row",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            gap: spacing.md,
+          }}
+        >
+          <View style={{ flex: 1, gap: spacing.xs }}>
+            <Text style={{ color: colors.gray, fontSize: 14, fontWeight: "600", textAlign: isRtl ? "right" : "left" }}>
+              {t(getGreetingKey())}
+            </Text>
+            <Text
+              style={{
+                color: colors.primary,
+                fontSize: 28,
+                fontWeight: "800",
+                lineHeight: 32,
+                textAlign: isRtl ? "right" : "left",
+              }}
+              numberOfLines={2}
+            >
+              {user?.name || t("homeTitle")}
+            </Text>
+          </View>
+          <Pressable
+            onPress={() => router.push("/(tabs)/profile")}
+            style={({ pressed }) => [
+              {
+                width: 50,
+                height: 50,
+                borderRadius: 14,
+                backgroundColor: colors.primary,
+                borderWidth: 1,
+                borderColor: "#1F6C59",
+                alignItems: "center",
+                justifyContent: "center",
+                shadowColor: colors.primary,
+                shadowOpacity: 0.16,
+                shadowRadius: 10,
+                shadowOffset: { width: 0, height: 6 },
+              },
+              pressed && { opacity: 0.82 },
+            ]}
+          >
+            <Ionicons name="person-outline" size={20} color={colors.white} />
+          </Pressable>
         </View>
-        <PrimaryButton onPress={() => router.push("/booking")}>{t("createDelivery")}</PrimaryButton>
-        <Text style={{ color: colors.charcoal, fontSize: 18, fontWeight: "700", textAlign: isRtl ? "right" : "left" }}>
-          {t("recentOrders")}
-        </Text>
-        {orders.length === 0 ? (
+
+        <View
+          style={{
+            backgroundColor: colors.primary,
+            borderRadius: 24,
+            padding: 20,
+            gap: spacing.sm,
+            borderWidth: 1,
+            borderColor: "#0F725B",
+          }}
+        >
+          <Text style={{ fontSize: 28 }}>{user?.role === "customer" ? "📦" : "🛵"}</Text>
+          <View style={{ gap: spacing.sm }}>
+            <Text
+              style={{
+                color: colors.white,
+                fontSize: 22,
+                fontWeight: "800",
+                lineHeight: 26,
+                textAlign: isRtl ? "right" : "left",
+              }}
+            >
+              {t("homeHeroTitle")}
+            </Text>
+            <Text
+              style={{
+                color: "#D9E9E3",
+                fontSize: 14,
+                lineHeight: 21,
+                textAlign: isRtl ? "right" : "left",
+              }}
+            >
+              {t("homeHeroBody")}
+            </Text>
+          </View>
+          <Pressable
+            onPress={() => router.push("/booking")}
+            style={({ pressed }) => [
+              {
+                alignSelf: isRtl ? "flex-end" : "flex-start",
+                minHeight: 48,
+                borderRadius: 24,
+                backgroundColor: "#16503F",
+                paddingHorizontal: 20,
+                alignItems: "center",
+                justifyContent: "center",
+                flexDirection: isRtl ? "row-reverse" : "row",
+                gap: spacing.sm,
+              },
+              pressed && { opacity: 0.88 },
+            ]}
+          >
+            <Text style={{ color: colors.white, fontSize: 16, fontWeight: "800" }}>{t("newOrder")}</Text>
+            <Ionicons name={isRtl ? "arrow-back" : "arrow-forward"} size={18} color={colors.white} />
+          </Pressable>
+        </View>
+
+        <View style={{ flexDirection: isRtl ? "row-reverse" : "row", gap: spacing.sm }}>
+          {[
+            { label: t("activeOrders"), value: activeOrders.length, tone: colors.warning },
+            { label: t("deliveredOrders"), value: deliveredOrders.length, tone: colors.secondary },
+            { label: t("totalValue"), value: totalValue, tone: colors.primary, suffix: t("sar") },
+          ].map((stat) => (
+            <View
+              key={stat.label}
+              style={{
+                flex: 1,
+                minHeight: 88,
+                backgroundColor: "#FBF5E7",
+                borderRadius: 18,
+                borderWidth: 1,
+                borderColor: "#D8CCAE",
+                paddingHorizontal: 10,
+                paddingVertical: 12,
+                justifyContent: "center",
+                alignItems: "center",
+                gap: spacing.xs,
+              }}
+            >
+              <Text style={{ color: stat.tone, fontSize: 20, fontWeight: "800", textAlign: "center" }}>
+                {stat.value}
+                {stat.suffix ? ` ${stat.suffix}` : ""}
+              </Text>
+              <Text style={{ color: colors.gray, fontSize: 12, fontWeight: "600", textAlign: "center" }}>{stat.label}</Text>
+            </View>
+          ))}
+        </View>
+
+        <View
+          style={{
+            flexDirection: isRtl ? "row-reverse" : "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: spacing.md,
+          }}
+        >
+          <Text style={{ color: colors.charcoal, fontSize: 18, fontWeight: "800", textAlign: isRtl ? "right" : "left" }}>
+            {t("recentOrders")}
+          </Text>
+          <Pressable onPress={() => router.push("/(tabs)/orders")} style={({ pressed }) => [pressed && { opacity: 0.72 }]}>
+            <Text style={{ color: colors.primary, fontSize: 14, fontWeight: "700" }}>
+              {t("seeAll")} {isRtl ? "←" : "→"}
+            </Text>
+          </Pressable>
+        </View>
+
+        {loading && orders.length === 0 ? (
+          <HomeSkeleton />
+        ) : recentOrders.length === 0 ? (
           <Card>
             <Text style={{ color: colors.gray, textAlign: isRtl ? "right" : "left" }}>{t("noOrders")}</Text>
           </Card>
         ) : (
-          orders.map((item) => (
-            <Pressable key={item.id} onPress={() => router.push(`/order/${item.id}`)}>
-              <Card>
-                <View style={{ flexDirection: isRtl ? "row-reverse" : "row", justifyContent: "space-between", gap: spacing.sm }}>
-                  <Text style={{ color: colors.charcoal, fontWeight: "700", flex: 1, textAlign: isRtl ? "right" : "left" }}>
-                    {item.itemDescription}
-                  </Text>
-                  <Pill>{t(item.status)}</Pill>
-                </View>
-                <Text style={{ color: colors.gray, textAlign: isRtl ? "right" : "left" }}>
-                  {item.pickupAddress} {isRtl ? "إلى" : "to"} {item.dropoffAddress}
-                </Text>
-                <Text style={{ color: colors.primary, fontWeight: "700", textAlign: isRtl ? "right" : "left" }}>
-                  {item.price} {t("sar")}
-                </Text>
-              </Card>
-            </Pressable>
-          ))
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ gap: spacing.sm, paddingRight: isRtl ? 0 : spacing.xs, paddingLeft: isRtl ? spacing.xs : 0 }}
+          >
+            {recentOrders.map((item) => {
+              const statusPalette = getStatusPalette(item.status);
+              return (
+                <Pressable key={item.id} onPress={() => router.push(`/order/${item.id}`)}>
+                  <View
+                    style={{
+                      width: 160,
+                      minHeight: 122,
+                      backgroundColor: "#FBF5E7",
+                      borderRadius: 18,
+                      borderWidth: 1,
+                      borderColor: "#D8CCAE",
+                      padding: 10,
+                      justifyContent: "space-between",
+                      gap: spacing.xs,
+                    }}
+                  >
+                    <View style={{ gap: spacing.xs }}>
+                      <View
+                        style={{
+                          width: 26,
+                          height: 26,
+                          borderRadius: 9,
+                          backgroundColor: "#F3EAD9",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Ionicons
+                          name={item.packageType === "documents" ? "document-text-outline" : "cube-outline"}
+                          size={14}
+                          color={colors.warning}
+                        />
+                      </View>
+                      <View style={{ gap: spacing.xs }}>
+                        <Text style={{ color: colors.charcoal, fontSize: 16, fontWeight: "800" }}>
+                          {getOrderReference(item.id)}
+                        </Text>
+                        <Text
+                          style={{ color: colors.gray, fontSize: 11, lineHeight: 16, textAlign: isRtl ? "right" : "left" }}
+                          numberOfLines={2}
+                        >
+                          {formatCompactAddress(item.pickupAddress)}
+                        </Text>
+                      </View>
+                    </View>
+
+                    <View
+                      style={{
+                        alignSelf: isRtl ? "flex-end" : "flex-start",
+                        flexDirection: isRtl ? "row-reverse" : "row",
+                        alignItems: "center",
+                        gap: spacing.xs,
+                        borderRadius: 999,
+                        backgroundColor: statusPalette.backgroundColor,
+                        paddingHorizontal: 9,
+                        paddingVertical: 5,
+                      }}
+                    >
+                      <View
+                        style={{
+                          width: 10,
+                          height: 10,
+                          borderRadius: 5,
+                          backgroundColor: statusPalette.dotColor,
+                        }}
+                      />
+                      <Text style={{ color: statusPalette.textColor, fontSize: 11, fontWeight: "800" }}>{t(item.status)}</Text>
+                      
+                    </View>
+                  </View>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
         )}
       </ScrollView>
     </Screen>
+  );
+}
+
+function HomeSkeleton() {
+  const opacity = useRef(new Animated.Value(0.4)).current;
+
+  useEffect(() => {
+    const anim = Animated.loop(
+      Animated.sequence([
+        Animated.timing(opacity, { toValue: 1, duration: 700, useNativeDriver: true }),
+        Animated.timing(opacity, { toValue: 0.4, duration: 700, useNativeDriver: true }),
+      ]),
+    );
+    anim.start();
+    return () => anim.stop();
+  }, [opacity]);
+
+  return (
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10 }}>
+      {[1, 2, 3].map((i) => (
+        <Animated.View
+          key={i}
+          style={{
+            width: 160,
+            height: 122,
+            borderRadius: 18,
+            backgroundColor: "#E2D9C2",
+            opacity,
+          }}
+        />
+      ))}
+    </ScrollView>
   );
 }
 

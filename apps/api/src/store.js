@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import pg from "pg";
 
 const { Pool } = pg;
@@ -23,6 +24,7 @@ const orderFields = `
   status,
   courier_id as "courierId",
   delivered_at as "deliveredAt",
+  canceled_at as "canceledAt",
   estimated_delivery_minutes as "estimatedDeliveryMinutes",
   created_at as "createdAt",
   updated_at as "updatedAt"
@@ -49,6 +51,7 @@ const orderSelectFields = `
   o.status,
   o.courier_id as "courierId",
   o.delivered_at as "deliveredAt",
+  o.canceled_at as "canceledAt",
   o.estimated_delivery_minutes as "estimatedDeliveryMinutes",
   o.created_at as "createdAt",
   o.updated_at as "updatedAt",
@@ -158,6 +161,7 @@ function publicOrder(order) {
       : null,
     estimatedDeliveryMinutes: Number(order.estimatedDeliveryMinutes),
     deliveredAt: order.deliveredAt ?? null,
+    canceledAt: order.canceledAt ?? null,
     matchedRiderCount: Number(order.matchedRiderCount ?? 0),
     pendingRiderCount: Number(order.pendingRiderCount ?? 0),
     createdAt: order.createdAt,
@@ -188,6 +192,21 @@ function storeError(code) {
   const error = new Error(code);
   error.code = code;
   return error;
+}
+
+const DELIVERY_OTP_TTL_MS = 10 * 60 * 1000;
+const PASSWORD_RESET_OTP_TTL_MS = 10 * 60 * 1000;
+
+function hashOtp(code) {
+  return crypto.createHash("sha256").update(String(code)).digest("hex");
+}
+
+function createDeliveryOtp() {
+  return String(crypto.randomInt(100000, 1000000));
+}
+
+function createPasswordResetOtp() {
+  return String(crypto.randomInt(100000, 1000000));
 }
 
 export function createStore(databaseUrl) {
@@ -228,6 +247,9 @@ function createMemoryStore() {
         phone,
         passwordHash,
         pushToken: null,
+        passwordResetOtpHash: null,
+        passwordResetOtpExpiresAt: null,
+        passwordResetOtpSentAt: null,
         createdAt: nowIso(),
       };
       users.push(user);
@@ -257,6 +279,36 @@ function createMemoryStore() {
     async findUserByPhone(phone) {
       return users.find((user) => user.phone === phone) || null;
     },
+    async requestPasswordResetOtp(phone) {
+      const user = users.find((item) => item.phone === phone);
+      if (!user) return null;
+
+      const code = createPasswordResetOtp();
+      const expiresAt = new Date(Date.now() + PASSWORD_RESET_OTP_TTL_MS).toISOString();
+      user.passwordResetOtpHash = hashOtp(code);
+      user.passwordResetOtpExpiresAt = expiresAt;
+      user.passwordResetOtpSentAt = nowIso();
+
+      return {
+        recipientPhone: user.phone,
+        expiresAt,
+        code,
+      };
+    },
+    async resetPasswordWithOtp(phone, otp, passwordHash) {
+      const user = users.find((item) => item.phone === phone);
+      if (!user) throw storeError("user_not_found");
+      if (!user.passwordResetOtpHash || !user.passwordResetOtpExpiresAt) throw storeError("password_reset_otp_missing");
+      if (new Date(user.passwordResetOtpExpiresAt).getTime() < Date.now()) throw storeError("password_reset_otp_expired");
+      if (!otp || hashOtp(otp) !== user.passwordResetOtpHash) throw storeError("password_reset_otp_invalid");
+
+      user.passwordHash = passwordHash;
+      user.passwordResetOtpHash = null;
+      user.passwordResetOtpExpiresAt = null;
+      user.passwordResetOtpSentAt = null;
+
+      return publicUser(user);
+    },
     async findCourierByPhone(phone) {
       return couriers.find((courier) => courier.phone === phone) || null;
     },
@@ -281,6 +333,10 @@ function createMemoryStore() {
         status: "pending",
         courierId: null,
         deliveredAt: null,
+        canceledAt: null,
+        deliveryOtpHash: null,
+        deliveryOtpExpiresAt: null,
+        deliveryOtpSentAt: null,
         createdAt: nowIso(),
         updatedAt: nowIso(),
         ...input,
@@ -288,9 +344,12 @@ function createMemoryStore() {
       orders.unshift(order);
       return publicOrder(withOrderMeta(order));
     },
-    async listOrders({ userId, includeAll = false }) {
-      const result = includeAll ? orders : orders.filter((order) => order.userId === userId);
-      return result.map((order) => publicOrder(withOrderMeta(order)));
+    async listOrders({ userId, includeAll = false, page = 1, limit = 20 } = {}) {
+      const all = includeAll ? orders : orders.filter((order) => order.userId === userId);
+      const total = all.length;
+      const offset = (page - 1) * limit;
+      const result = all.slice(offset, offset + limit);
+      return { orders: result.map((order) => publicOrder(withOrderMeta(order))), total, page, limit };
     },
     async getOrderById(id) {
       const order = getOrderRecord(id);
@@ -399,16 +458,44 @@ function createMemoryStore() {
       return order ? publicOrder(withOrderMeta(order)) : null;
     },
     async markOrderDelivered(orderId, courierId) {
+      return this.markOrderDeliveredWithOtp(orderId, courierId, null);
+    },
+    async requestDeliveryOtp(orderId, courierId) {
       const order = getOrderRecord(orderId);
       if (!order) throw storeError("order_not_found");
       if (order.status === "delivered") throw storeError("order_already_delivered");
       if (order.status !== "assigned" || order.courierId !== courierId) throw storeError("not_assigned_to_rider");
+
+      const code = createDeliveryOtp();
+      const expiresAt = new Date(Date.now() + DELIVERY_OTP_TTL_MS).toISOString();
+      order.deliveryOtpHash = hashOtp(code);
+      order.deliveryOtpExpiresAt = expiresAt;
+      order.deliveryOtpSentAt = nowIso();
+      order.updatedAt = nowIso();
+
+      return {
+        recipientPhone: order.recipientPhone,
+        expiresAt,
+        code,
+      };
+    },
+    async markOrderDeliveredWithOtp(orderId, courierId, otp) {
+      const order = getOrderRecord(orderId);
+      if (!order) throw storeError("order_not_found");
+      if (order.status === "delivered") throw storeError("order_already_delivered");
+      if (order.status !== "assigned" || order.courierId !== courierId) throw storeError("not_assigned_to_rider");
+      if (!order.deliveryOtpHash || !order.deliveryOtpExpiresAt) throw storeError("delivery_otp_missing");
+      if (new Date(order.deliveryOtpExpiresAt).getTime() < Date.now()) throw storeError("delivery_otp_expired");
+      if (!otp || hashOtp(otp) !== order.deliveryOtpHash) throw storeError("delivery_otp_invalid");
 
       const courier = getCourierRecord(courierId);
       if (!courier) throw storeError("rider_not_found");
 
       order.status = "delivered";
       order.deliveredAt = nowIso();
+      order.deliveryOtpHash = null;
+      order.deliveryOtpExpiresAt = null;
+      order.deliveryOtpSentAt = null;
       order.updatedAt = nowIso();
       courier.activeOrderId = null;
 
@@ -418,6 +505,17 @@ function createMemoryStore() {
       return orders
         .filter((order) => order.courierId === courierId)
         .map((order) => publicOrder(withOrderMeta(order)));
+    },
+    async cancelOrder(orderId, userId) {
+      const order = getOrderRecord(orderId);
+      if (!order) throw storeError("order_not_found");
+      if (order.userId !== userId) throw storeError("not_order_owner");
+      if (order.status !== "pending") throw storeError("order_not_cancelable");
+
+      order.status = "canceled";
+      order.canceledAt = nowIso();
+      order.updatedAt = nowIso();
+      return publicOrder(withOrderMeta(order));
     },
   };
 }
@@ -465,12 +563,101 @@ function createPostgresStore(databaseUrl) {
     },
     async findUserByPhone(phone) {
       const result = await pool.query(
-        `select id, name, phone, password_hash as "passwordHash", push_token, created_at
+        `select id, name, phone, password_hash as "passwordHash", push_token,
+                password_reset_otp_hash as "passwordResetOtpHash",
+                password_reset_otp_expires_at as "passwordResetOtpExpiresAt",
+                password_reset_otp_sent_at as "passwordResetOtpSentAt",
+                created_at
          from users
          where phone = $1`,
         [phone],
       );
       return result.rows[0] || null;
+    },
+    async requestPasswordResetOtp(phone) {
+      const client = await pool.connect();
+
+      try {
+        await client.query("begin");
+
+        const userResult = await client.query(
+          `select id, phone
+           from users
+           where phone = $1
+           for update`,
+          [phone],
+        );
+        const user = userResult.rows[0];
+        if (!user) {
+          await client.query("commit");
+          return null;
+        }
+
+        const code = createPasswordResetOtp();
+        const expiresAt = new Date(Date.now() + PASSWORD_RESET_OTP_TTL_MS).toISOString();
+
+        await client.query(
+          `update users
+           set password_reset_otp_hash = $2,
+               password_reset_otp_expires_at = $3,
+               password_reset_otp_sent_at = now()
+           where id = $1`,
+          [user.id, hashOtp(code), expiresAt],
+        );
+
+        await client.query("commit");
+        return {
+          recipientPhone: user.phone,
+          expiresAt,
+          code,
+        };
+      } catch (error) {
+        await client.query("rollback");
+        throw error;
+      } finally {
+        client.release();
+      }
+    },
+    async resetPasswordWithOtp(phone, otp, passwordHash) {
+      const client = await pool.connect();
+
+      try {
+        await client.query("begin");
+
+        const userResult = await client.query(
+          `select id,
+                  password_reset_otp_hash as "passwordResetOtpHash",
+                  password_reset_otp_expires_at as "passwordResetOtpExpiresAt"
+           from users
+           where phone = $1
+           for update`,
+          [phone],
+        );
+        const user = userResult.rows[0];
+        if (!user) throw storeError("user_not_found");
+        if (!user.passwordResetOtpHash || !user.passwordResetOtpExpiresAt) throw storeError("password_reset_otp_missing");
+        if (new Date(user.passwordResetOtpExpiresAt).getTime() < Date.now()) throw storeError("password_reset_otp_expired");
+        if (!otp || hashOtp(otp) !== user.passwordResetOtpHash) throw storeError("password_reset_otp_invalid");
+
+        await client.query(
+          `update users
+           set password_hash = $2,
+               password_reset_otp_hash = null,
+               password_reset_otp_expires_at = null,
+               password_reset_otp_sent_at = null
+           where id = $1`,
+          [user.id, passwordHash],
+        );
+
+        await client.query("commit");
+      } catch (error) {
+        await client.query("rollback");
+        throw error;
+      } finally {
+        client.release();
+      }
+
+      return this.findUserByPhone(phone);
     },
     async findCourierByPhone(phone) {
       const result = await pool.query(
@@ -558,14 +745,23 @@ function createPostgresStore(databaseUrl) {
       );
       return publicOrder(result.rows[0]);
     },
-    async listOrders({ userId, includeAll = false }) {
+    async listOrders({ userId, includeAll = false, page = 1, limit = 20 } = {}) {
+      const offset = (page - 1) * limit;
+
+      const countResult = includeAll
+        ? await pool.query(`select count(*) from orders`)
+        : await pool.query(`select count(*) from orders where user_id = $1`, [userId]);
+      const total = Number(countResult.rows[0].count);
+
       const result = includeAll
         ? await pool.query(
             `select ${orderSelectFields}
              from orders o
              left join couriers c on c.id = o.courier_id
              left join users u on u.id = o.user_id
-             order by o.created_at desc`,
+             order by o.created_at desc
+             limit $1 offset $2`,
+            [limit, offset],
           )
         : await pool.query(
             `select ${orderSelectFields}
@@ -573,11 +769,12 @@ function createPostgresStore(databaseUrl) {
              left join couriers c on c.id = o.courier_id
              left join users u on u.id = o.user_id
              where o.user_id = $1
-             order by o.created_at desc`,
-            [userId],
+             order by o.created_at desc
+             limit $2 offset $3`,
+            [userId, limit, offset],
           );
 
-      return result.rows.map((order) => publicOrder(order));
+      return { orders: result.rows.map((order) => publicOrder(order)), total, page, limit };
     },
     async getOrderById(id) {
       const result = await pool.query(
@@ -596,6 +793,7 @@ function createPostgresStore(databaseUrl) {
         courierId: "courier_id",
         paymentMethod: "payment_method",
         deliveredAt: "delivered_at",
+        canceledAt: "canceled_at",
       };
       const entries = Object.entries(patch).filter(([key]) => allowed[key]);
       if (!entries.length) return this.getOrderById(id);
@@ -824,14 +1022,14 @@ function createPostgresStore(databaseUrl) {
       );
       return publicOrder(result.rows[0]);
     },
-    async markOrderDelivered(orderId, courierId) {
+    async requestDeliveryOtp(orderId, courierId) {
       const client = await pool.connect();
 
       try {
         await client.query("begin");
 
         const orderResult = await client.query(
-          `select id, status, courier_id as "courierId"
+          `select id, status, courier_id as "courierId", recipient_phone as "recipientPhone"
            from orders
            where id = $1
            for update`,
@@ -842,9 +1040,66 @@ function createPostgresStore(databaseUrl) {
         if (order.status === "delivered") throw storeError("order_already_delivered");
         if (order.status !== "assigned" || order.courierId !== courierId) throw storeError("not_assigned_to_rider");
 
+        const code = createDeliveryOtp();
+        const expiresAt = new Date(Date.now() + DELIVERY_OTP_TTL_MS).toISOString();
+
         await client.query(
           `update orders
-           set status = 'delivered', delivered_at = now(), updated_at = now()
+           set delivery_otp_hash = $2,
+               delivery_otp_expires_at = $3,
+               delivery_otp_sent_at = now(),
+               updated_at = now()
+           where id = $1`,
+          [orderId, hashOtp(code), expiresAt],
+        );
+
+        await client.query("commit");
+        return {
+          recipientPhone: order.recipientPhone,
+          expiresAt,
+          code,
+        };
+      } catch (error) {
+        await client.query("rollback");
+        throw error;
+      } finally {
+        client.release();
+      }
+    },
+    async markOrderDelivered(orderId, courierId) {
+      return this.markOrderDeliveredWithOtp(orderId, courierId, null);
+    },
+    async markOrderDeliveredWithOtp(orderId, courierId, otp) {
+      const client = await pool.connect();
+
+      try {
+        await client.query("begin");
+
+        const orderResult = await client.query(
+          `select id, status, courier_id as "courierId",
+                  delivery_otp_hash as "deliveryOtpHash",
+                  delivery_otp_expires_at as "deliveryOtpExpiresAt"
+           from orders
+           where id = $1
+           for update`,
+          [orderId],
+        );
+        const order = orderResult.rows[0];
+        if (!order) throw storeError("order_not_found");
+        if (order.status === "delivered") throw storeError("order_already_delivered");
+        if (order.status !== "assigned" || order.courierId !== courierId) throw storeError("not_assigned_to_rider");
+        if (!order.deliveryOtpHash || !order.deliveryOtpExpiresAt) throw storeError("delivery_otp_missing");
+        if (new Date(order.deliveryOtpExpiresAt).getTime() < Date.now()) throw storeError("delivery_otp_expired");
+        if (!otp || hashOtp(otp) !== order.deliveryOtpHash) throw storeError("delivery_otp_invalid");
+
+        await client.query(
+          `update orders
+           set status = 'delivered',
+               delivered_at = now(),
+               delivery_otp_hash = null,
+               delivery_otp_expires_at = null,
+               delivery_otp_sent_at = null,
+               updated_at = now()
            where id = $1`,
           [orderId],
         );
@@ -877,6 +1132,42 @@ function createPostgresStore(databaseUrl) {
         [courierId],
       );
       return result.rows.map((order) => publicOrder(order));
+    },
+    async cancelOrder(orderId, userId) {
+      const client = await pool.connect();
+      try {
+        await client.query("begin");
+
+        const orderResult = await client.query(
+          `select id, status, user_id as "userId"
+           from orders
+           where id = $1
+           for update`,
+          [orderId],
+        );
+        const order = orderResult.rows[0];
+        if (!order) throw storeError("order_not_found");
+        if (order.userId !== userId) throw storeError("not_order_owner");
+        if (order.status !== "pending") throw storeError("order_not_cancelable");
+
+        await client.query(
+          `update orders
+           set status = 'canceled',
+               canceled_at = now(),
+               updated_at = now()
+           where id = $1`,
+          [orderId],
+        );
+
+        await client.query("commit");
+      } catch (error) {
+        await client.query("rollback");
+        throw error;
+      } finally {
+        client.release();
+      }
+
+      return this.getOrderById(orderId);
     },
   };
 }

@@ -10,6 +10,8 @@ export const config = {
   adminApiKey: process.env.ADMIN_API_KEY || (isProduction ? "" : "wasel-dev-admin"),
   databaseUrl: process.env.DATABASE_URL || "",
   corsOrigin: process.env.CORS_ORIGIN || "*",
+  stripeSecretKey: process.env.STRIPE_SECRET_KEY || "",
+  apiBaseUrl: process.env.API_BASE_URL || "http://localhost:4000",
   devAdmin: {
     enabled: process.env.SEED_DEV_ADMIN !== "false" && !process.env.DATABASE_URL,
     name: process.env.DEV_ADMIN_NAME || "Wasel Admin",

@@ -175,6 +175,39 @@ export default function App() {
 
       {error && <p className="error">{error}</p>}
 
+      <section className="couriers-section">
+        <h2 className="section-heading">Couriers ({couriers.length})</h2>
+        <p className="section-note">Riders manage their own availability from the mobile app.</p>
+        {couriers.length === 0 ? (
+          <p className="empty">No couriers registered yet.</p>
+        ) : (
+          <table className="couriers-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Available</th>
+                <th>Active order</th>
+              </tr>
+            </thead>
+            <tbody>
+              {couriers.map((courier) => (
+                <tr key={courier.id}>
+                  <td>{courier.name}</td>
+                  <td>{courier.phone}</td>
+                  <td>
+                    <span className={`availability-badge ${courier.isAvailable ? "available" : "offline"}`}>
+                      {courier.isAvailable ? "Yes" : "No"}
+                    </span>
+                  </td>
+                  <td>{courier.activeOrderId ? courier.activeOrderId.slice(-8).toUpperCase() : "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </section>
+
       <section className="orders">
         {filteredOrders.map((order) => (
           <article className="order-card" key={order.id}>
