@@ -44,6 +44,7 @@ const forgotPasswordLimiter = rateLimit({
   message: { error: "too_many_requests" },
 });
 
+app.set("trust proxy", 1);
 app.use(cors({ origin: config.corsOrigin }));
 app.use(express.json());
 
