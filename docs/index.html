@@ -9,35 +9,37 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: #EDF4F0;
+      background: #F5FAF7;
       color: #0D1F18;
       min-height: 100vh;
       overflow-x: hidden;
     }
 
-    /* ── Realistic map background ── */
-    .map-bg {
+    /* ── Topographic background ── */
+    .topo-bg {
       position: fixed;
       inset: 0;
       z-index: 0;
       overflow: hidden;
+      pointer-events: none;
     }
 
-    .map-bg svg {
+    .topo-bg svg {
       width: 100%;
       height: 100%;
     }
 
+    /* ── Nav ── */
     nav {
       position: relative;
       z-index: 10;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 20px 48px;
-      background: rgba(237, 244, 240, 0.85);
+      padding: 20px 56px;
+      background: rgba(245, 250, 247, 0.88);
       backdrop-filter: blur(14px);
-      border-bottom: 1px solid rgba(10, 92, 74, 0.09);
+      border-bottom: 1px solid rgba(10, 92, 74, 0.08);
     }
 
     .nav-logo {
@@ -69,7 +71,7 @@
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 32px;
+      gap: 36px;
       list-style: none;
     }
 
@@ -78,10 +80,11 @@
       text-decoration: none;
       font-size: 15px;
       font-weight: 500;
+      transition: color 0.2s;
     }
 
-    .nav-links a:hover { color: #0A5C4A; }
-    .nav-links a.active { color: #0A5C4A; font-weight: 700; }
+    .nav-links a:hover,
+    .nav-links a.active { color: #0A5C4A; font-weight: 600; }
 
     .nav-actions {
       display: flex;
@@ -108,9 +111,10 @@
       padding: 10px 22px;
       border-radius: 22px;
       text-decoration: none;
+      transition: background 0.2s;
     }
 
-    .btn-download-nav:hover { background: #0d7a61; }
+    .btn-download-nav:hover { background: #0c7260; }
 
     /* ── Hero ── */
     .hero {
@@ -119,7 +123,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 80px 48px 60px;
+      padding: 90px 56px 70px;
       min-height: calc(100vh - 79px);
       gap: 40px;
     }
@@ -133,11 +137,11 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: rgba(10, 92, 74, 0.1);
+      background: rgba(10, 92, 74, 0.09);
       color: #0A5C4A;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
-      letter-spacing: 1.5px;
+      letter-spacing: 1.8px;
       text-transform: uppercase;
       padding: 7px 14px;
       border-radius: 20px;
@@ -154,15 +158,15 @@
 
     @keyframes pulse {
       0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(1.3); }
+      50% { opacity: 0.45; transform: scale(1.4); }
     }
 
     .hero-headline {
-      font-size: 58px;
+      font-size: 60px;
       font-weight: 900;
-      line-height: 1.08;
+      line-height: 1.06;
       color: #0D1F18;
-      margin-bottom: 24px;
+      margin-bottom: 22px;
     }
 
     .hero-headline span { color: #0A5C4A; }
@@ -170,22 +174,18 @@
     .hero-sub {
       font-size: 17px;
       color: #4A5E56;
-      line-height: 1.7;
+      line-height: 1.75;
       margin-bottom: 40px;
       max-width: 420px;
     }
 
-    .hero-ctas {
-      display: flex;
-      gap: 14px;
-      flex-wrap: wrap;
-    }
+    .hero-ctas { display: flex; gap: 14px; flex-wrap: wrap; }
 
     .btn-store {
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      background: #000;
+      background: #111;
       color: #fff;
       text-decoration: none;
       padding: 11px 20px;
@@ -193,27 +193,11 @@
       transition: opacity 0.2s;
     }
 
-    .btn-store:hover { opacity: 0.85; }
+    .btn-store:hover { opacity: 0.82; }
 
-    .btn-store .store-label {
-      display: flex;
-      flex-direction: column;
-      line-height: 1.2;
-    }
-
-    .btn-store .store-sub {
-      font-size: 10px;
-      font-weight: 400;
-      opacity: 0.85;
-    }
-
-    .btn-store .store-name {
-      font-size: 17px;
-      font-weight: 700;
-      letter-spacing: -0.3px;
-    }
-
-    .btn-store.google { background: #1a1a1a; }
+    .btn-store .store-label { display: flex; flex-direction: column; line-height: 1.2; }
+    .btn-store .store-sub { font-size: 10px; opacity: 0.8; }
+    .btn-store .store-name { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
 
     /* ── Phone mockup ── */
     .hero-right {
@@ -222,7 +206,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      max-width: 480px;
+      max-width: 460px;
     }
 
     .float-card {
@@ -230,79 +214,71 @@
       background: #fff;
       border-radius: 16px;
       padding: 14px 18px;
-      box-shadow: 0 8px 32px rgba(10,92,74,0.14);
-      font-size: 13px;
-      color: #2D4038;
+      box-shadow: 0 8px 32px rgba(10,92,74,0.13);
       z-index: 2;
     }
 
     .float-card .card-label { font-size: 11px; color: #7A8B82; margin-bottom: 3px; }
     .float-card .card-value { font-size: 22px; font-weight: 800; color: #0A5C4A; }
 
-    .float-eta { top: 32%; left: -10px; }
-    .float-deliveries { bottom: 14%; right: -10px; }
+    .float-eta { top: 30%; left: -8px; }
+    .float-deliveries { bottom: 12%; right: -8px; }
 
-    /* Phone frame - proper portrait */
-    .phone-wrap {
-      position: relative;
-      z-index: 1;
-    }
+    .phone-wrap { position: relative; z-index: 1; }
 
     .phone-frame {
       width: 248px;
-      height: 520px;
+      height: 524px;
       background: #111;
-      border-radius: 44px;
+      border-radius: 46px;
       padding: 12px;
       box-shadow:
-        0 40px 100px rgba(10,30,20,0.28),
-        0 0 0 1px rgba(255,255,255,0.07),
+        0 48px 100px rgba(10,30,20,0.26),
+        0 0 0 1px rgba(255,255,255,0.06),
         inset 0 0 0 1px rgba(255,255,255,0.04);
       position: relative;
     }
 
-    /* Side buttons */
     .phone-frame::before {
       content: "";
       position: absolute;
       right: -3px;
-      top: 100px;
+      top: 108px;
       width: 3px;
-      height: 60px;
-      background: #333;
-      border-radius: 0 2px 2px 0;
-      box-shadow: 0 80px 0 #333;
+      height: 62px;
+      background: #2a2a2a;
+      border-radius: 0 3px 3px 0;
+      box-shadow: 0 84px 0 #2a2a2a;
     }
 
     .phone-frame::after {
       content: "";
       position: absolute;
       left: -3px;
-      top: 80px;
+      top: 86px;
       width: 3px;
-      height: 36px;
-      background: #333;
-      border-radius: 2px 0 0 2px;
-      box-shadow: 0 50px 0 #333, 0 96px 0 #333;
+      height: 38px;
+      background: #2a2a2a;
+      border-radius: 3px 0 0 3px;
+      box-shadow: 0 52px 0 #2a2a2a, 0 100px 0 #2a2a2a;
     }
 
     .phone-screen {
       width: 100%;
       height: 100%;
-      border-radius: 34px;
+      border-radius: 36px;
       overflow: hidden;
-      background: #E8F4F0;
+      background: #D8EDE5;
       display: flex;
       flex-direction: column;
     }
 
-    /* Dynamic island */
     .phone-island {
       position: absolute;
       top: 18px;
       left: 50%;
       transform: translateX(-50%);
-      width: 80px;
+      width: 84px;
       height: 26px;
       background: #111;
       border-radius: 20px;
@@ -311,7 +287,7 @@
 
     .phone-header {
       background: #0A5C4A;
-      padding: 42px 16px 14px;
+      padding: 44px 16px 14px;
       color: #fff;
       flex-shrink: 0;
     }
@@ -337,7 +313,6 @@
       margin-top: 3px;
     }
 
-    /* Realistic map inside phone */
     .phone-map {
       flex: 1;
       position: relative;
@@ -359,7 +334,7 @@
       color: #2D4038;
       font-weight: 600;
       flex-shrink: 0;
-      border-top: 1px solid #E8F0ED;
+      border-top: 1px solid #E4EFE9;
     }
 
     .live-badge {
@@ -371,37 +346,47 @@
       border-radius: 10px;
     }
 
-    /* ── Features section ── */
-    section { position: relative; z-index: 1; }
+    /* ── Sections ── */
+    section { position: relative; z-index: 1; scroll-margin-top: 79px; }
 
-    .features {
-      padding: 80px 48px;
-      background: rgba(255,255,255,0.72);
+    /* About */
+    .about {
+      padding: 100px 56px;
+      background: rgba(255,255,255,0.78);
       backdrop-filter: blur(12px);
+      border-top: 1px solid rgba(10,92,74,0.07);
     }
 
-    .section-label {
-      font-size: 12px;
+    .section-eyebrow {
+      font-size: 11px;
       font-weight: 700;
-      letter-spacing: 2px;
+      letter-spacing: 2.5px;
       text-transform: uppercase;
       color: #12967A;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
 
     .section-title {
-      font-size: 38px;
+      font-size: 40px;
       font-weight: 900;
       color: #0D1F18;
-      margin-bottom: 48px;
-      max-width: 480px;
-      line-height: 1.15;
+      margin-bottom: 16px;
+      max-width: 540px;
+      line-height: 1.12;
+    }
+
+    .section-sub {
+      font-size: 17px;
+      color: #4A5E56;
+      line-height: 1.7;
+      max-width: 560px;
+      margin-bottom: 56px;
     }
 
     .features-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
+      gap: 22px;
     }
 
     .feature-card {
@@ -409,7 +394,10 @@
       border-radius: 20px;
       padding: 28px;
       border: 1px solid rgba(10,92,74,0.08);
+      transition: box-shadow 0.2s;
     }
+
+    .feature-card:hover { box-shadow: 0 8px 32px rgba(10,92,74,0.10); }
 
     .feature-icon {
       width: 48px;
@@ -423,15 +411,31 @@
     }
 
     .feature-card h3 { font-size: 17px; font-weight: 700; color: #0D1F18; margin-bottom: 8px; }
-    .feature-card p { font-size: 14px; color: #4A5E56; line-height: 1.6; }
+    .feature-card p { font-size: 14px; color: #4A5E56; line-height: 1.65; }
 
-    .how { padding: 80px 48px; }
+    /* How it works */
+    .how {
+      padding: 100px 56px;
+      border-top: 1px solid rgba(10,92,74,0.07);
+    }
 
     .steps {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 24px;
-      margin-top: 48px;
+      gap: 28px;
+      margin-top: 52px;
+      position: relative;
+    }
+
+    .steps::before {
+      content: "";
+      position: absolute;
+      top: 26px;
+      left: calc(12.5% + 14px);
+      right: calc(12.5% + 14px);
+      height: 2px;
+      background: linear-gradient(90deg, #0A5C4A, #12967A);
+      opacity: 0.2;
     }
 
     .step { text-align: center; }
@@ -447,25 +451,80 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto 16px;
+      margin: 0 auto 18px;
+      box-shadow: 0 4px 16px rgba(10,92,74,0.25);
     }
 
     .step h3 { font-size: 16px; font-weight: 700; color: #0D1F18; margin-bottom: 8px; }
-    .step p { font-size: 14px; color: #4A5E56; line-height: 1.6; }
+    .step p { font-size: 14px; color: #4A5E56; line-height: 1.65; }
 
-    .cta-section {
-      background: #0A5C4A;
-      padding: 80px 48px;
-      text-align: center;
+    /* Contact */
+    .contact-section {
+      padding: 100px 56px;
+      background: rgba(255,255,255,0.78);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid rgba(10,92,74,0.07);
+      display: flex;
+      gap: 80px;
+      align-items: flex-start;
     }
 
-    .cta-section h2 { font-size: 42px; font-weight: 900; color: #fff; margin-bottom: 14px; }
-    .cta-section p { font-size: 18px; color: rgba(255,255,255,0.75); margin-bottom: 36px; }
-    .cta-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .contact-left { flex: 1; max-width: 420px; }
+    .contact-right { flex: 1; }
+
+    .contact-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .contact-icon {
+      width: 44px;
+      height: 44px;
+      background: rgba(10,92,74,0.09);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .contact-item h4 { font-size: 15px; font-weight: 700; color: #0D1F18; margin-bottom: 3px; }
+    .contact-item p, .contact-item a {
+      font-size: 14px;
+      color: #4A5E56;
+      text-decoration: none;
+    }
+
+    .contact-item a:hover { color: #0A5C4A; }
+
+    /* CTA */
+    .cta-section {
+      background: #0A5C4A;
+      padding: 90px 56px;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .cta-section::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 30% 50%, rgba(18,150,122,0.3) 0%, transparent 60%),
+                  radial-gradient(ellipse at 70% 50%, rgba(10,92,74,0.4) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .cta-section h2 { font-size: 44px; font-weight: 900; color: #fff; margin-bottom: 14px; position: relative; }
+    .cta-section p { font-size: 18px; color: rgba(255,255,255,0.72); margin-bottom: 36px; position: relative; }
+    .cta-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; position: relative; }
 
     .btn-store.light {
       background: rgba(255,255,255,0.12);
-      border: 1.5px solid rgba(255,255,255,0.25);
+      border: 1.5px solid rgba(255,255,255,0.22);
     }
 
     .btn-store.light:hover { background: rgba(255,255,255,0.2); }
@@ -474,173 +533,73 @@
       position: relative;
       z-index: 1;
       background: #0D1F18;
-      color: rgba(255,255,255,0.5);
-      padding: 32px 48px;
+      color: rgba(255,255,255,0.45);
+      padding: 28px 56px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       font-size: 14px;
     }
 
-    footer a { color: rgba(255,255,255,0.5); text-decoration: underline; }
+    footer a { color: rgba(255,255,255,0.45); text-decoration: underline; }
     footer a:hover { color: #fff; }
 
-    @media (max-width: 900px) {
-      nav { padding: 16px 24px; }
+    @media (max-width: 960px) {
+      nav, .hero, .about, .how, .contact-section, .cta-section, footer { padding-left: 24px; padding-right: 24px; }
       .nav-links { display: none; }
-      .hero { flex-direction: column; padding: 48px 24px; text-align: center; min-height: auto; }
-      .hero-headline { font-size: 36px; }
+      .hero { flex-direction: column; text-align: center; min-height: auto; padding-top: 56px; }
+      .hero-headline { font-size: 38px; }
       .hero-sub { margin: 0 auto 32px; }
       .hero-ctas { justify-content: center; }
-      .hero-right { width: 100%; }
-      .float-eta { left: 4px; }
-      .float-deliveries { right: 4px; }
-      .features { padding: 48px 24px; }
+      .float-eta { left: 0; }
+      .float-deliveries { right: 0; }
       .features-grid { grid-template-columns: 1fr; }
-      .how { padding: 48px 24px; }
       .steps { grid-template-columns: repeat(2, 1fr); }
-      .cta-section { padding: 48px 24px; }
-      .cta-section h2 { font-size: 28px; }
-      footer { flex-direction: column; gap: 12px; text-align: center; padding: 24px; }
+      .steps::before { display: none; }
+      .contact-section { flex-direction: column; gap: 40px; }
+      .cta-section h2 { font-size: 30px; }
+      footer { flex-direction: column; gap: 12px; text-align: center; }
     }
   </style>
 </head>
 <body>
 
-<!-- Realistic city map background -->
-<div class="map-bg">
+<!-- Topographic contour background -->
+<div class="topo-bg">
   <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-    <!-- Base land -->
-    <rect width="1440" height="900" fill="#EDF4F0"/>
-
-    <!-- ── City blocks (buildings/parcels) ── -->
-    <!-- Row 1 -->
-    <rect x="0" y="0" width="180" height="110" fill="#D9EDE5" rx="2"/>
-    <rect x="200" y="0" width="140" height="110" fill="#D9EDE5" rx="2"/>
-    <rect x="360" y="0" width="100" height="110" fill="#D5EBE2" rx="2"/>
-    <rect x="480" y="0" width="160" height="110" fill="#D9EDE5" rx="2"/>
-    <rect x="660" y="0" width="120" height="110" fill="#D5EBE2" rx="2"/>
-    <rect x="800" y="0" width="200" height="110" fill="#D9EDE5" rx="2"/>
-    <rect x="1020" y="0" width="130" height="110" fill="#D5EBE2" rx="2"/>
-    <rect x="1170" y="0" width="270" height="110" fill="#D9EDE5" rx="2"/>
-
-    <!-- Row 2 -->
-    <rect x="0" y="170" width="120" height="130" fill="#D9EDE5" rx="2"/>
-    <rect x="140" y="170" width="220" height="130" fill="#D5EBE2" rx="2"/>
-    <rect x="380" y="170" width="80" height="130" fill="#D9EDE5" rx="2"/>
-    <rect x="480" y="170" width="160" height="60" fill="#D5EBE2" rx="2"/>
-    <rect x="480" y="250" width="160" height="50" fill="#D9EDE5" rx="2"/>
-    <rect x="660" y="170" width="120" height="130" fill="#D5EBE2" rx="2"/>
-    <rect x="800" y="170" width="90" height="130" fill="#D9EDE5" rx="2"/>
-    <rect x="910" y="170" width="90" height="60" fill="#D5EBE2" rx="2"/>
-    <rect x="910" y="250" width="90" height="50" fill="#D9EDE5" rx="2"/>
-    <rect x="1020" y="170" width="130" height="130" fill="#D5EBE2" rx="2"/>
-    <rect x="1170" y="170" width="160" height="130" fill="#D9EDE5" rx="2"/>
-    <rect x="1350" y="170" width="90" height="130" fill="#D5EBE2" rx="2"/>
-
-    <!-- Park/green area -->
-    <rect x="640" y="155" width="0" height="0" fill="#C8E8D8" rx="4"/>
-
-    <!-- Row 3 -->
-    <rect x="0" y="360" width="200" height="100" fill="#D5EBE2" rx="2"/>
-    <rect x="220" y="360" width="140" height="100" fill="#D9EDE5" rx="2"/>
-    <rect x="380" y="360" width="80" height="100" fill="#D5EBE2" rx="2"/>
-    <rect x="480" y="360" width="80" height="100" fill="#D9EDE5" rx="2"/>
-    <rect x="580" y="360" width="60" height="100" fill="#D5EBE2" rx="2"/>
-    <rect x="660" y="360" width="120" height="100" fill="#D9EDE5" rx="2"/>
-    <rect x="800" y="360" width="180" height="100" fill="#D5EBE2" rx="2"/>
-    <rect x="1000" y="360" width="150" height="100" fill="#D9EDE5" rx="2"/>
-    <rect x="1170" y="360" width="110" height="100" fill="#D5EBE2" rx="2"/>
-    <rect x="1300" y="360" width="140" height="100" fill="#D9EDE5" rx="2"/>
-
-    <!-- Row 4 -->
-    <rect x="0" y="520" width="160" height="120" fill="#D9EDE5" rx="2"/>
-    <rect x="180" y="520" width="180" height="120" fill="#D5EBE2" rx="2"/>
-    <rect x="380" y="520" width="80" height="120" fill="#D9EDE5" rx="2"/>
-    <rect x="480" y="520" width="140" height="50" fill="#D5EBE2" rx="2"/>
-    <rect x="480" y="590" width="140" height="50" fill="#D9EDE5" rx="2"/>
-    <rect x="640" y="520" width="140" height="120" fill="#D5EBE2" rx="2"/>
-    <rect x="800" y="520" width="180" height="120" fill="#D9EDE5" rx="2"/>
-    <rect x="1000" y="520" width="150" height="120" fill="#D5EBE2" rx="2"/>
-    <rect x="1170" y="520" width="110" height="120" fill="#D9EDE5" rx="2"/>
-    <rect x="1300" y="520" width="140" height="120" fill="#D5EBE2" rx="2"/>
-
-    <!-- Row 5 -->
-    <rect x="0" y="700" width="160" height="200" fill="#D5EBE2" rx="2"/>
-    <rect x="180" y="700" width="180" height="200" fill="#D9EDE5" rx="2"/>
-    <rect x="380" y="700" width="80" height="200" fill="#D5EBE2" rx="2"/>
-    <rect x="480" y="700" width="140" height="200" fill="#D9EDE5" rx="2"/>
-    <rect x="640" y="700" width="140" height="200" fill="#D5EBE2" rx="2"/>
-    <rect x="800" y="700" width="180" height="200" fill="#D9EDE5" rx="2"/>
-    <rect x="1000" y="700" width="150" height="200" fill="#D5EBE2" rx="2"/>
-    <rect x="1170" y="700" width="110" height="200" fill="#D9EDE5" rx="2"/>
-    <rect x="1300" y="700" width="140" height="200" fill="#D5EBE2" rx="2"/>
-
-    <!-- ── Small park ── -->
-    <rect x="462" y="152" width="196" height="196" fill="#C4E2D4" rx="4"/>
-    <circle cx="560" cy="250" r="30" fill="#B0D9C6"/>
-    <circle cx="520" cy="220" r="18" fill="#B0D9C6"/>
-    <circle cx="598" cy="275" r="22" fill="#B0D9C6"/>
-
-    <!-- ── Highways (thick, slightly off-white) ── -->
-    <!-- Horizontal highway -->
-    <rect x="0" y="460" width="1440" height="50" fill="#E0EDE8"/>
-    <rect x="0" y="467" width="1440" height="36" fill="#fff" opacity="0.85"/>
-    <!-- Highway markings -->
-    <line x1="0" y1="485" x2="1440" y2="485" stroke="#C8D8D0" stroke-width="1.5" stroke-dasharray="30 20"/>
-
-    <!-- Vertical highway -->
-    <rect x="735" y="0" width="50" height="900" fill="#E0EDE8"/>
-    <rect x="742" y="0" width="36" height="900" fill="#fff" opacity="0.85"/>
-    <line x1="760" y1="0" x2="760" y2="900" stroke="#C8D8D0" stroke-width="1.5" stroke-dasharray="30 20"/>
-
-    <!-- ── Main roads (medium width) ── -->
-    <!-- Horizontal main roads -->
-    <rect x="0" y="120" width="1440" height="36" fill="#E8F2EE"/>
-    <line x1="0" y1="138" x2="430" y2="138" stroke="#C0D4CC" stroke-width="1" stroke-dasharray="16 12"/>
-    <line x1="490" y1="138" x2="1440" y2="138" stroke="#C0D4CC" stroke-width="1" stroke-dasharray="16 12"/>
-
-    <rect x="0" y="310" width="1440" height="36" fill="#E8F2EE"/>
-    <line x1="0" y1="328" x2="1440" y2="328" stroke="#C0D4CC" stroke-width="1" stroke-dasharray="16 12"/>
-
-    <rect x="0" y="650" width="1440" height="36" fill="#E8F2EE"/>
-    <line x1="0" y1="668" x2="1440" y2="668" stroke="#C0D4CC" stroke-width="1" stroke-dasharray="16 12"/>
-
-    <!-- Vertical main roads -->
-    <rect x="160" y="0" width="28" height="900" fill="#E8F2EE"/>
-    <line x1="174" y1="0" x2="174" y2="900" stroke="#C0D4CC" stroke-width="1" stroke-dasharray="16 12"/>
-
-    <rect x="360" y="0" width="28" height="900" fill="#E8F2EE"/>
-    <line x1="374" y1="0" x2="374" y2="900" stroke="#C0D4CC" stroke-width="1" stroke-dasharray="16 12"/>
-
-    <rect x="460" y="0" width="28" height="900" fill="#E8F2EE"/>
-
-    <rect x="640" y="0" width="28" height="900" fill="#E8F2EE"/>
-    <line x1="654" y1="0" x2="654" y2="900" stroke="#C0D4CC" stroke-width="1" stroke-dasharray="16 12"/>
-
-    <rect x="790" y="0" width="28" height="900" fill="#E8F2EE"/>
-    <line x1="804" y1="0" x2="804" y2="900" stroke="#C0D4CC" stroke-width="1" stroke-dasharray="16 12"/>
-
-    <rect x="1000" y="0" width="28" height="900" fill="#E8F2EE"/>
-    <line x1="1014" y1="0" x2="1014" y2="900" stroke="#C0D4CC" stroke-width="1" stroke-dasharray="16 12"/>
-
-    <rect x="1160" y="0" width="28" height="900" fill="#E8F2EE"/>
-    <line x1="1174" y1="0" x2="1174" y2="900" stroke="#C0D4CC" stroke-width="1" stroke-dasharray="16 12"/>
-
-    <rect x="1300" y="0" width="28" height="900" fill="#E8F2EE"/>
-
-    <!-- ── Roundabout at intersection ── -->
-    <circle cx="654" cy="485" r="34" fill="#E8F2EE"/>
-    <circle cx="654" cy="485" r="22" fill="#D4EAE2"/>
-    <circle cx="654" cy="485" r="10" fill="#C4E0D6"/>
-
-    <!-- ── Overlay fade so content is legible ── -->
-    <rect width="1440" height="900" fill="rgba(237,244,240,0.48)"/>
+    <rect width="1440" height="900" fill="#F5FAF7"/>
+    <!-- Contour lines - organic flowing curves -->
+    <g fill="none" stroke="#0A5C4A" stroke-width="1.2" opacity="0.07">
+      <path d="M-100,600 C100,580 200,560 350,540 C500,520 600,500 750,490 C900,480 1050,470 1200,460 C1350,450 1450,445 1540,440"/>
+      <path d="M-100,560 C80,545 180,530 320,515 C460,500 570,488 720,478 C870,468 1020,455 1170,445 C1320,435 1420,430 1540,425"/>
+      <path d="M-100,520 C60,508 160,498 300,486 C440,474 555,464 700,454 C845,444 990,434 1140,424 C1290,414 1390,408 1540,402"/>
+      <path d="M-100,480 C50,471 145,463 280,452 C415,441 530,433 678,424 C826,415 968,406 1118,396 C1268,386 1368,380 1540,374"/>
+      <path d="M-100,440 C40,432 130,425 262,416 C394,407 508,400 655,391 C802,382 946,372 1096,362 C1246,352 1346,347 1540,342"/>
+      <path d="M-100,400 C25,393 115,387 244,379 C373,371 487,364 634,355 C781,346 924,337 1074,327 C1224,317 1324,313 1540,308"/>
+      <path d="M-100,360 C15,354 100,348 226,341 C352,334 466,328 612,320 C758,312 902,303 1052,293 C1202,283 1302,279 1540,274"/>
+      <path d="M-100,640 C110,624 220,610 380,594 C540,578 640,566 800,556 C960,546 1110,536 1260,526 C1410,516 1510,511 1540,509"/>
+      <path d="M-100,680 C120,668 240,656 410,642 C580,628 680,618 840,608 C1000,598 1150,588 1300,578 C1450,568 1550,562 1540,561"/>
+      <path d="M-100,320 C10,314 90,309 212,303 C334,297 448,291 594,283 C740,275 884,267 1034,257 C1184,247 1284,243 1540,238"/>
+      <path d="M-100,720 C130,710 260,700 440,688 C620,676 720,666 880,657 C1040,648 1190,638 1340,629 C1490,620 1590,615 1540,613"/>
+      <path d="M-100,760 C140,752 280,744 470,734 C660,724 760,714 920,706 C1080,698 1230,688 1380,680 C1530,672 1630,667 1540,665"/>
+    </g>
+    <!-- Wider spaced bolder contours for depth -->
+    <g fill="none" stroke="#0A5C4A" stroke-width="2" opacity="0.04">
+      <path d="M-100,500 C70,487 170,476 310,466 C450,456 560,447 710,438 C860,429 1010,420 1160,411 C1310,402 1410,397 1540,392"/>
+      <path d="M-100,580 C90,567 200,556 350,545 C500,534 610,525 760,516 C910,507 1060,498 1210,489 C1360,480 1460,475 1540,471"/>
+      <path d="M-100,420 C55,410 150,402 286,394 C422,386 533,379 680,370 C827,361 972,352 1122,343 C1272,334 1372,329 1540,324"/>
+    </g>
+    <!-- Subtle radial glow center-right -->
+    <radialGradient id="glow" cx="75%" cy="45%" r="45%">
+      <stop offset="0%" stop-color="#12967A" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#12967A" stop-opacity="0"/>
+    </radialGradient>
+    <rect width="1440" height="900" fill="url(#glow)"/>
   </svg>
 </div>
 
 <nav>
-  <a href="/" class="nav-logo">
+  <a href="#" class="nav-logo">
     <div class="nav-logo-icon">و</div>
     <span class="nav-logo-text">Wasel</span>
   </a>
@@ -656,7 +615,8 @@
   </div>
 </nav>
 
-<section class="hero">
+<!-- Home -->
+<section class="hero" id="home">
   <div class="hero-left">
     <div class="badge">
       <span class="badge-dot"></span>
@@ -679,7 +639,7 @@
           <span class="store-name">App Store</span>
         </div>
       </a>
-      <a href="#" class="btn-store google">
+      <a href="#" class="btn-store">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
           <path d="M3.18 1.09C2.77 1.52 2.5 2.18 2.5 3.04v17.92c0 .86.27 1.52.69 1.94l.1.1L13.43 12.5v-.28L3.28.99l-.1.1z" fill="#EA4335"/>
           <path d="M17.12 16.19l-3.69-3.69v-.28l3.69-3.69.08.05 4.37 2.48c1.25.71 1.25 1.87 0 2.58l-4.37 2.48-.08.07z" fill="#FBBC04"/>
@@ -709,81 +669,62 @@
             <div class="ph-order">Order #2841</div>
           </div>
           <div class="phone-map">
-            <!-- Realistic mini map inside phone -->
-            <svg viewBox="0 0 224 290" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-              <!-- Base -->
-              <rect width="224" height="290" fill="#D8EDE5"/>
-
+            <svg viewBox="0 0 224 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+              <rect width="224" height="300" fill="#D8EDE5"/>
               <!-- City blocks -->
               <rect x="0" y="0" width="55" height="70" fill="#C8E4D8" rx="1"/>
               <rect x="65" y="0" width="65" height="70" fill="#CCE7DB" rx="1"/>
               <rect x="140" y="0" width="84" height="70" fill="#C8E4D8" rx="1"/>
-
-              <rect x="0" y="90" width="55" height="80" fill="#CCE7DB" rx="1"/>
-              <rect x="65" y="90" width="30" height="38" fill="#C8E4D8" rx="1"/>
-              <rect x="65" y="134" width="30" height="36" fill="#CCE7DB" rx="1"/>
-              <rect x="105" y="90" width="25" height="80" fill="#C8E4D8" rx="1"/>
-              <rect x="140" y="90" width="84" height="80" fill="#CCE7DB" rx="1"/>
-
-              <!-- Park -->
-              <rect x="60" y="82" width="48" height="0" fill="#B8DECA" rx="2"/>
-
-              <rect x="0" y="192" width="55" height="98" fill="#C8E4D8" rx="1"/>
-              <rect x="65" y="192" width="65" height="45" fill="#CCE7DB" rx="1"/>
-              <rect x="65" y="245" width="65" height="45" fill="#C8E4D8" rx="1"/>
-              <rect x="140" y="192" width="84" height="98" fill="#CCE7DB" rx="1"/>
-
-              <!-- Main roads horizontal -->
+              <rect x="0" y="90" width="55" height="85" fill="#CCE7DB" rx="1"/>
+              <rect x="65" y="90" width="30" height="40" fill="#C8E4D8" rx="1"/>
+              <rect x="65" y="136" width="30" height="39" fill="#CCE7DB" rx="1"/>
+              <rect x="105" y="90" width="25" height="85" fill="#C8E4D8" rx="1"/>
+              <rect x="140" y="90" width="84" height="85" fill="#CCE7DB" rx="1"/>
+              <rect x="0" y="198" width="55" height="102" fill="#C8E4D8" rx="1"/>
+              <rect x="65" y="198" width="65" height="47" fill="#CCE7DB" rx="1"/>
+              <rect x="65" y="252" width="65" height="48" fill="#C8E4D8" rx="1"/>
+              <rect x="140" y="198" width="84" height="102" fill="#CCE7DB" rx="1"/>
+              <!-- Roads horizontal -->
               <rect x="0" y="78" width="224" height="10" fill="#EAF3EF"/>
-              <rect x="0" y="180" width="224" height="10" fill="#EAF3EF"/>
-
-              <!-- Main roads vertical -->
-              <rect x="57" y="0" width="8" height="290" fill="#EAF3EF"/>
-              <rect x="132" y="0" width="8" height="290" fill="#EAF3EF"/>
-
-              <!-- Road center dashes -->
+              <rect x="0" y="186" width="224" height="10" fill="#EAF3EF"/>
+              <!-- Roads vertical -->
+              <rect x="57" y="0" width="8" height="300" fill="#EAF3EF"/>
+              <rect x="132" y="0" width="8" height="300" fill="#EAF3EF"/>
+              <!-- Dashes -->
               <line x1="0" y1="83" x2="224" y2="83" stroke="rgba(255,255,255,0.6)" stroke-width="1" stroke-dasharray="10 8"/>
-              <line x1="0" y1="185" x2="224" y2="185" stroke="rgba(255,255,255,0.6)" stroke-width="1" stroke-dasharray="10 8"/>
-              <line x1="61" y1="0" x2="61" y2="290" stroke="rgba(255,255,255,0.6)" stroke-width="1" stroke-dasharray="10 8"/>
-              <line x1="136" y1="0" x2="136" y2="290" stroke="rgba(255,255,255,0.6)" stroke-width="1" stroke-dasharray="10 8"/>
-
+              <line x1="0" y1="191" x2="224" y2="191" stroke="rgba(255,255,255,0.6)" stroke-width="1" stroke-dasharray="10 8"/>
+              <line x1="61" y1="0" x2="61" y2="300" stroke="rgba(255,255,255,0.6)" stroke-width="1" stroke-dasharray="10 8"/>
+              <line x1="136" y1="0" x2="136" y2="300" stroke="rgba(255,255,255,0.6)" stroke-width="1" stroke-dasharray="10 8"/>
               <!-- Small streets -->
-              <line x1="0" y1="35" x2="57" y2="35" stroke="#C8DED8" stroke-width="4"/>
-              <line x1="65" y1="35" x2="132" y2="35" stroke="#C8DED8" stroke-width="4"/>
-              <line x1="140" y1="35" x2="224" y2="35" stroke="#C8DED8" stroke-width="4"/>
-              <line x1="0" y1="130" x2="57" y2="130" stroke="#C8DED8" stroke-width="4"/>
-              <line x1="65" y1="130" x2="132" y2="130" stroke="#C8DED8" stroke-width="4"/>
-              <line x1="140" y1="130" x2="224" y2="130" stroke="#C8DED8" stroke-width="4"/>
-              <line x1="0" y1="230" x2="57" y2="230" stroke="#C8DED8" stroke-width="4"/>
-              <line x1="65" y1="230" x2="132" y2="230" stroke="#C8DED8" stroke-width="4"/>
-              <line x1="140" y1="230" x2="224" y2="230" stroke="#C8DED8" stroke-width="4"/>
-              <line x1="25" y1="0" x2="25" y2="78" stroke="#C8DED8" stroke-width="4"/>
-              <line x1="25" y1="88" x2="25" y2="180" stroke="#C8DED8" stroke-width="4"/>
-              <line x1="25" y1="190" x2="25" y2="290" stroke="#C8DED8" stroke-width="4"/>
-              <line x1="95" y1="0" x2="95" y2="78" stroke="#C8DED8" stroke-width="4"/>
-              <line x1="95" y1="88" x2="95" y2="180" stroke="#C8DED8" stroke-width="4"/>
-              <line x1="95" y1="190" x2="95" y2="290" stroke="#C8DED8" stroke-width="4"/>
-              <line x1="170" y1="0" x2="170" y2="78" stroke="#C8DED8" stroke-width="4"/>
-              <line x1="170" y1="88" x2="170" y2="180" stroke="#C8DED8" stroke-width="4"/>
-              <line x1="170" y1="190" x2="170" y2="290" stroke="#C8DED8" stroke-width="4"/>
-
-              <!-- Route path -->
-              <polyline points="112,210 112,185 112,83 136,83 136,48" stroke="#0A5C4A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 5" opacity="0.9"/>
-
-              <!-- Rider dot with pulse -->
-              <circle cx="112" cy="210" r="16" fill="#0A5C4A" opacity="0.15"/>
-              <circle cx="112" cy="210" r="10" fill="#0A5C4A" opacity="0.25"/>
-              <circle cx="112" cy="210" r="7" fill="#0A5C4A"/>
-              <circle cx="112" cy="210" r="3.5" fill="#fff"/>
-
+              <line x1="0" y1="36" x2="57" y2="36" stroke="#C4DDD6" stroke-width="4"/>
+              <line x1="65" y1="36" x2="132" y2="36" stroke="#C4DDD6" stroke-width="4"/>
+              <line x1="140" y1="36" x2="224" y2="36" stroke="#C4DDD6" stroke-width="4"/>
+              <line x1="0" y1="134" x2="57" y2="134" stroke="#C4DDD6" stroke-width="4"/>
+              <line x1="65" y1="134" x2="132" y2="134" stroke="#C4DDD6" stroke-width="4"/>
+              <line x1="140" y1="134" x2="224" y2="134" stroke="#C4DDD6" stroke-width="4"/>
+              <line x1="0" y1="240" x2="57" y2="240" stroke="#C4DDD6" stroke-width="4"/>
+              <line x1="65" y1="240" x2="132" y2="240" stroke="#C4DDD6" stroke-width="4"/>
+              <line x1="140" y1="240" x2="224" y2="240" stroke="#C4DDD6" stroke-width="4"/>
+              <line x1="27" y1="0" x2="27" y2="78" stroke="#C4DDD6" stroke-width="4"/>
+              <line x1="27" y1="88" x2="27" y2="186" stroke="#C4DDD6" stroke-width="4"/>
+              <line x1="27" y1="196" x2="27" y2="300" stroke="#C4DDD6" stroke-width="4"/>
+              <line x1="95" y1="0" x2="95" y2="78" stroke="#C4DDD6" stroke-width="4"/>
+              <line x1="95" y1="88" x2="95" y2="186" stroke="#C4DDD6" stroke-width="4"/>
+              <line x1="95" y1="196" x2="95" y2="300" stroke="#C4DDD6" stroke-width="4"/>
+              <line x1="168" y1="0" x2="168" y2="78" stroke="#C4DDD6" stroke-width="4"/>
+              <line x1="168" y1="88" x2="168" y2="186" stroke="#C4DDD6" stroke-width="4"/>
+              <line x1="168" y1="196" x2="168" y2="300" stroke="#C4DDD6" stroke-width="4"/>
+              <!-- Route -->
+              <polyline points="112,220 112,191 112,83 136,83 136,50" stroke="#0A5C4A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 5" opacity="0.9"/>
+              <!-- Rider pulse -->
+              <circle cx="112" cy="220" r="18" fill="#0A5C4A" opacity="0.12"/>
+              <circle cx="112" cy="220" r="11" fill="#0A5C4A" opacity="0.22"/>
+              <circle cx="112" cy="220" r="7" fill="#0A5C4A"/>
+              <circle cx="112" cy="220" r="3" fill="#fff"/>
               <!-- Destination pin -->
-              <ellipse cx="136" cy="51" rx="5" ry="2.5" fill="rgba(0,0,0,0.12)"/>
-              <path d="M136 28 C130 28 126 32.5 126 37.5 C126 45 136 51 136 51 C136 51 146 45 146 37.5 C146 32.5 142 28 136 28Z" fill="#0A5C4A"/>
-              <circle cx="136" cy="37.5" r="4.5" fill="#fff"/>
-
-              <!-- Small building labels -->
-              <rect x="72" y="95" width="22" height="10" rx="2" fill="rgba(255,255,255,0.7)"/>
-              <rect x="146" y="20" width="28" height="10" rx="2" fill="rgba(255,255,255,0.7)"/>
+              <ellipse cx="136" cy="53" rx="5" ry="2.5" fill="rgba(0,0,0,0.12)"/>
+              <path d="M136 30 C130 30 126 34.5 126 39.5 C126 47 136 53 136 53 C136 53 146 47 146 39.5 C146 34.5 142 30 136 30Z" fill="#0A5C4A"/>
+              <circle cx="136" cy="39.5" r="4.5" fill="#fff"/>
             </svg>
           </div>
           <div class="phone-footer">
@@ -801,9 +742,11 @@
   </div>
 </section>
 
-<section class="features" id="about">
-  <div class="section-label">Why Wasel</div>
+<!-- About -->
+<section class="about" id="about">
+  <div class="section-eyebrow">About Wasel</div>
   <div class="section-title">Built for speed, designed for Riyadh.</div>
+  <p class="section-sub">Wasel is a same-day local delivery platform built for individuals and businesses who need packages moved fast across the city. Independent riders, real-time tracking, zero hassle.</p>
   <div class="features-grid">
     <div class="feature-card">
       <div class="feature-icon">
@@ -812,7 +755,7 @@
         </svg>
       </div>
       <h3>Live GPS Tracking</h3>
-      <p>Watch your rider move in real time. Know exactly when your package arrives.</p>
+      <p>Watch your rider move in real time. Know exactly when your package arrives, down to the minute.</p>
     </div>
     <div class="feature-card">
       <div class="feature-icon">
@@ -821,7 +764,7 @@
         </svg>
       </div>
       <h3>Instant Matching</h3>
-      <p>Our algorithm finds the nearest available rider and dispatches them in seconds.</p>
+      <p>Our algorithm finds the nearest available rider and dispatches them within seconds of your order.</p>
     </div>
     <div class="feature-card">
       <div class="feature-icon">
@@ -830,13 +773,14 @@
         </svg>
       </div>
       <h3>Secure Payments</h3>
-      <p>Pay safely by card via Stripe. No card numbers stored on our servers.</p>
+      <p>Pay by card via Stripe. No card numbers stored on our servers, ever.</p>
     </div>
   </div>
 </section>
 
+<!-- How It Works -->
 <section class="how" id="how">
-  <div class="section-label">How It Works</div>
+  <div class="section-eyebrow">How It Works</div>
   <div class="section-title">Four steps to delivery.</div>
   <div class="steps">
     <div class="step">
@@ -847,21 +791,22 @@
     <div class="step">
       <div class="step-num">2</div>
       <h3>Get Matched</h3>
-      <p>We instantly assign the nearest available rider to your order.</p>
+      <p>We instantly assign the nearest available rider.</p>
     </div>
     <div class="step">
       <div class="step-num">3</div>
       <h3>Track Live</h3>
-      <p>Follow your rider on the map in real time with live ETA updates.</p>
+      <p>Follow your rider on the map with live ETA updates.</p>
     </div>
     <div class="step">
       <div class="step-num">4</div>
       <h3>Delivered</h3>
-      <p>Package arrives. You get a notification and delivery confirmation.</p>
+      <p>Package arrives. You get a push notification confirmation.</p>
     </div>
   </div>
 </section>
 
+<!-- CTA -->
 <section class="cta-section">
   <h2>Ready to send?</h2>
   <p>Download Wasel and place your first delivery in under a minute.</p>
@@ -890,12 +835,53 @@
   </div>
 </section>
 
-<footer id="contact">
-  <span>© 2026 Wasel. All rights reserved.</span>
-  <div style="display:flex;gap:24px;align-items:center;">
-    <a href="privacy.html">Privacy Policy</a>
-    <a href="mailto:faisalzafar52@gmail.com">Contact</a>
+<!-- Contact -->
+<section class="contact-section" id="contact">
+  <div class="contact-left">
+    <div class="section-eyebrow">Contact</div>
+    <div class="section-title">Get in touch.</div>
+    <p class="section-sub" style="margin-bottom:0;">Questions, partnerships, or support — reach out and we'll get back to you.</p>
   </div>
+  <div class="contact-right">
+    <div class="contact-item">
+      <div class="contact-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="#0A5C4A"/>
+        </svg>
+      </div>
+      <div>
+        <h4>Email</h4>
+        <a href="mailto:faisalzafar52@gmail.com">faisalzafar52@gmail.com</a>
+      </div>
+    </div>
+    <div class="contact-item">
+      <div class="contact-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#0A5C4A"/>
+        </svg>
+      </div>
+      <div>
+        <h4>Location</h4>
+        <p>Riyadh, Saudi Arabia</p>
+      </div>
+    </div>
+    <div class="contact-item">
+      <div class="contact-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 4.18l5 2.23V11c0 3.35-2.31 6.48-5 7.53-2.69-1.05-5-4.18-5-7.53V7.41l5-2.23z" fill="#0A5C4A"/>
+        </svg>
+      </div>
+      <div>
+        <h4>Privacy</h4>
+        <a href="privacy.html">Privacy Policy</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>© 2026 Wasel. All rights reserved.</span>
+  <a href="privacy.html">Privacy Policy</a>
 </footer>
 
 </body>
