@@ -64,10 +64,7 @@
   }
   .logo-mark {
     width: 36px; height: 36px;
-    background: var(--green);
-    border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
-    color: white; font-size: 1rem; font-weight: 800;
   }
   .nav-links {
     display: flex; align-items: center; gap: 2px;
@@ -82,9 +79,11 @@
     transition: background 0.15s, color 0.15s;
     cursor: pointer;
   }
-  .nav-links a:hover, .nav-links a.active {
-    background: var(--teal-light);
-    color: var(--green);
+  .nav-links a:hover { background: var(--teal-light); color: var(--green); }
+  .nav-links a.active {
+    background: var(--green);
+    color: #fff;
+    font-weight: 700;
   }
   .nav-top-row { display: contents; }
   .nav-right { display: flex; align-items: center; gap: 10px; }
@@ -569,16 +568,20 @@
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
-      border-top: 1px solid rgba(10,92,74,0.07);
-      padding: 0 4%;
-      gap: 4px;
+      border-top: 1px solid rgba(10,92,74,0.09);
+      padding: 8px 4%;
+      gap: 6px;
+      background: rgba(255,255,255,0.96);
     }
     .nav-links::-webkit-scrollbar { display: none; }
     .nav-links li { flex-shrink: 0; }
     .nav-links a {
-      font-size: 0.82rem;
-      padding: 10px 12px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 10px 18px;
       white-space: nowrap;
+      border-radius: var(--radius-pill);
+      color: #4A5E56;
     }
     .cta-nav { display: none; }
     :root { --nav-h: 100px; }
@@ -600,7 +603,19 @@
 <nav id="main-nav">
   <div class="nav-top-row">
     <a class="nav-logo" href="#" onclick="showPage('home')">
-      <div class="logo-mark">و</div>
+      <div class="logo-mark">
+      <svg width="28" height="36" viewBox="0 0 52 68" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M26 0C11.641 0 0 11.641 0 26c0 17 26 42 26 42s26-25 26-42C52 11.641 40.359 0 26 0z" fill="#0A5C4A"/>
+        <rect x="10" y="26" width="32" height="8" rx="2.5" fill="white" opacity="0.95"/>
+        <path d="M15 26 L19 19 L33 19 L37 26Z" fill="white" opacity="0.95"/>
+        <path d="M20.5 25.5 L23 20.5 L29 20.5 L31.5 25.5Z" fill="#0A5C4A" opacity="0.5"/>
+        <circle cx="17" cy="34" r="4" fill="#0A5C4A" opacity="0.7"/>
+        <circle cx="17" cy="34" r="2" fill="white" opacity="0.6"/>
+        <circle cx="35" cy="34" r="4" fill="#0A5C4A" opacity="0.7"/>
+        <circle cx="35" cy="34" r="2" fill="white" opacity="0.6"/>
+        <circle cx="26" cy="60" r="3" fill="#12967A" opacity="0.8"/>
+      </svg>
+    </div>
       <span id="logo-text">Wasel</span>
     </a>
     <div class="nav-right">
