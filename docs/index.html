@@ -113,12 +113,35 @@
 
   /* ── HERO ── */
   .hero {
-    background: linear-gradient(150deg, #f0faf6 0%, #ffffff 60%);
+    background: transparent;
     padding: 80px 5% 60px;
     display: grid; grid-template-columns: 1fr 1fr;
     gap: 48px; align-items: center;
     min-height: calc(100vh - var(--nav-h));
+    position: relative;
+    overflow: hidden;
   }
+  .hero-map-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .hero-map-bg svg { width: 100%; height: 100%; }
+  .hero-map-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(
+      to right,
+      rgba(245,250,247,0.97) 0%,
+      rgba(245,250,247,0.92) 40%,
+      rgba(245,250,247,0.55) 70%,
+      rgba(245,250,247,0.25) 100%
+    );
+    pointer-events: none;
+  }
+  .hero-content, .hero-visual { position: relative; z-index: 2; }
   .hero-badge {
     display: inline-flex; align-items: center; gap: 8px;
     background: var(--teal-light);
@@ -564,6 +587,134 @@
 
   <!-- HERO -->
   <section class="hero">
+    <!-- Realistic city map background -->
+    <div class="hero-map-bg">
+      <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <rect width="1440" height="900" fill="#E8F4EF"/>
+        <!-- City blocks -->
+        <rect x="0"    y="0"   width="170" height="120" fill="#D6EBE2" rx="2"/>
+        <rect x="190"  y="0"   width="130" height="120" fill="#DAEDE5" rx="2"/>
+        <rect x="340"  y="0"   width="180" height="120" fill="#D6EBE2" rx="2"/>
+        <rect x="540"  y="0"   width="110" height="120" fill="#DAEDE5" rx="2"/>
+        <rect x="670"  y="0"   width="160" height="120" fill="#D6EBE2" rx="2"/>
+        <rect x="850"  y="0"   width="140" height="120" fill="#DAEDE5" rx="2"/>
+        <rect x="1010" y="0"   width="190" height="120" fill="#D6EBE2" rx="2"/>
+        <rect x="1220" y="0"   width="220" height="120" fill="#DAEDE5" rx="2"/>
+
+        <rect x="0"    y="188" width="170" height="160" fill="#DAEDE5" rx="2"/>
+        <rect x="190"  y="188" width="130" height="72"  fill="#D6EBE2" rx="2"/>
+        <rect x="190"  y="276" width="130" height="72"  fill="#DAEDE5" rx="2"/>
+        <rect x="340"  y="188" width="85"  height="160" fill="#D6EBE2" rx="2"/>
+        <rect x="443"  y="188" width="77"  height="160" fill="#DAEDE5" rx="2"/>
+        <rect x="540"  y="188" width="110" height="72"  fill="#D6EBE2" rx="2"/>
+        <rect x="540"  y="276" width="110" height="72"  fill="#DAEDE5" rx="2"/>
+        <rect x="670"  y="188" width="160" height="160" fill="#D6EBE2" rx="2"/>
+        <rect x="850"  y="188" width="140" height="160" fill="#DAEDE5" rx="2"/>
+        <rect x="1010" y="188" width="90"  height="160" fill="#D6EBE2" rx="2"/>
+        <rect x="1118" y="188" width="80"  height="160" fill="#DAEDE5" rx="2"/>
+        <rect x="1220" y="188" width="220" height="160" fill="#D6EBE2" rx="2"/>
+
+        <!-- Park -->
+        <rect x="340" y="420" width="280" height="180" fill="#C2E2D4" rx="4"/>
+        <ellipse cx="420" cy="490" rx="28" ry="20" fill="#AED9C6"/>
+        <ellipse cx="500" cy="510" rx="22" ry="18" fill="#AED9C6"/>
+        <ellipse cx="560" cy="480" rx="26" ry="19" fill="#AED9C6"/>
+        <ellipse cx="460" cy="550" rx="20" ry="16" fill="#AED9C6"/>
+        <circle cx="390" cy="540" r="10" fill="#A4D4C0"/>
+        <circle cx="590" cy="545" r="12" fill="#A4D4C0"/>
+
+        <rect x="0"    y="420" width="170" height="140" fill="#D6EBE2" rx="2"/>
+        <rect x="190"  y="420" width="130" height="64"  fill="#DAEDE5" rx="2"/>
+        <rect x="190"  y="500" width="130" height="60"  fill="#D6EBE2" rx="2"/>
+        <rect x="670"  y="420" width="160" height="140" fill="#DAEDE5" rx="2"/>
+        <rect x="850"  y="420" width="140" height="64"  fill="#D6EBE2" rx="2"/>
+        <rect x="850"  y="500" width="140" height="60"  fill="#DAEDE5" rx="2"/>
+        <rect x="1010" y="420" width="170" height="140" fill="#D6EBE2" rx="2"/>
+        <rect x="1220" y="420" width="220" height="140" fill="#DAEDE5" rx="2"/>
+
+        <rect x="0"    y="628" width="170" height="272" fill="#DAEDE5" rx="2"/>
+        <rect x="190"  y="628" width="130" height="130" fill="#D6EBE2" rx="2"/>
+        <rect x="190"  y="770" width="130" height="130" fill="#DAEDE5" rx="2"/>
+        <rect x="340"  y="628" width="280" height="272" fill="#D6EBE2" rx="2"/>
+        <rect x="670"  y="628" width="160" height="272" fill="#DAEDE5" rx="2"/>
+        <rect x="850"  y="628" width="140" height="272" fill="#D6EBE2" rx="2"/>
+        <rect x="1010" y="628" width="170" height="272" fill="#DAEDE5" rx="2"/>
+        <rect x="1220" y="628" width="220" height="272" fill="#D6EBE2" rx="2"/>
+
+        <!-- Highway horizontal -->
+        <rect x="0" y="374" width="1440" height="38" fill="#E4EFE9"/>
+        <rect x="0" y="379" width="1440" height="28" fill="#fff" opacity="0.7"/>
+        <line x1="0" y1="393" x2="1440" y2="393" stroke="#C8DDD5" stroke-width="1.5" stroke-dasharray="28 18"/>
+
+        <!-- Highway vertical -->
+        <rect x="830" y="0" width="38" height="900" fill="#E4EFE9"/>
+        <rect x="835" y="0" width="28" height="900" fill="#fff" opacity="0.7"/>
+        <line x1="849" y1="0" x2="849" y2="900" stroke="#C8DDD5" stroke-width="1.5" stroke-dasharray="28 18"/>
+
+        <!-- Main roads horizontal -->
+        <rect x="0"   y="136" width="1440" height="42" fill="#EAF3EE"/>
+        <line x1="0" y1="157" x2="1440" y2="157" stroke="#C4D8D0" stroke-dasharray="18 14" stroke-width="1"/>
+        <rect x="0"   y="564" width="1440" height="42" fill="#EAF3EE"/>
+        <line x1="0" y1="585" x2="1440" y2="585" stroke="#C4D8D0" stroke-dasharray="18 14" stroke-width="1"/>
+
+        <!-- Main roads vertical -->
+        <rect x="168"  y="0" width="32" height="900" fill="#EAF3EE"/>
+        <line x1="184" y1="0" x2="184" y2="900" stroke="#C4D8D0" stroke-dasharray="18 14" stroke-width="1"/>
+        <rect x="318"  y="0" width="32" height="900" fill="#EAF3EE"/>
+        <line x1="334" y1="0" x2="334" y2="900" stroke="#C4D8D0" stroke-dasharray="18 14" stroke-width="1"/>
+        <rect x="648"  y="0" width="32" height="900" fill="#EAF3EE"/>
+        <line x1="664" y1="0" x2="664" y2="900" stroke="#C4D8D0" stroke-dasharray="18 14" stroke-width="1"/>
+        <rect x="988"  y="0" width="32" height="900" fill="#EAF3EE"/>
+        <line x1="1004" y1="0" x2="1004" y2="900" stroke="#C4D8D0" stroke-dasharray="18 14" stroke-width="1"/>
+        <rect x="1198" y="0" width="32" height="900" fill="#EAF3EE"/>
+        <line x1="1214" y1="0" x2="1214" y2="900" stroke="#C4D8D0" stroke-dasharray="18 14" stroke-width="1"/>
+
+        <!-- Small local streets -->
+        <line x1="0"    y1="315" x2="318"  y2="315" stroke="#DCE8E3" stroke-width="6"/>
+        <line x1="350"  y1="315" x2="648"  y2="315" stroke="#DCE8E3" stroke-width="6"/>
+        <line x1="680"  y1="315" x2="830"  y2="315" stroke="#DCE8E3" stroke-width="6"/>
+        <line x1="868"  y1="315" x2="988"  y2="315" stroke="#DCE8E3" stroke-width="6"/>
+        <line x1="1020" y1="315" x2="1198" y2="315" stroke="#DCE8E3" stroke-width="6"/>
+        <line x1="1230" y1="315" x2="1440" y2="315" stroke="#DCE8E3" stroke-width="6"/>
+
+        <line x1="0"    y1="700" x2="318"  y2="700" stroke="#DCE8E3" stroke-width="6"/>
+        <line x1="350"  y1="700" x2="648"  y2="700" stroke="#DCE8E3" stroke-width="6"/>
+        <line x1="680"  y1="700" x2="830"  y2="700" stroke="#DCE8E3" stroke-width="6"/>
+        <line x1="868"  y1="700" x2="988"  y2="700" stroke="#DCE8E3" stroke-width="6"/>
+        <line x1="1020" y1="700" x2="1198" y2="700" stroke="#DCE8E3" stroke-width="6"/>
+        <line x1="1230" y1="700" x2="1440" y2="700" stroke="#DCE8E3" stroke-width="6"/>
+
+        <line x1="520"  y1="136" x2="520"  y2="374" stroke="#DCE8E3" stroke-width="6"/>
+        <line x1="520"  y1="412" x2="520"  y2="564" stroke="#DCE8E3" stroke-width="6"/>
+        <line x1="520"  y1="606" x2="520"  y2="900" stroke="#DCE8E3" stroke-width="6"/>
+        <line x1="760"  y1="136" x2="760"  y2="374" stroke="#DCE8E3" stroke-width="6"/>
+        <line x1="760"  y1="412" x2="760"  y2="564" stroke="#DCE8E3" stroke-width="6"/>
+        <line x1="760"  y1="606" x2="760"  y2="900" stroke="#DCE8E3" stroke-width="6"/>
+        <line x1="1100" y1="136" x2="1100" y2="374" stroke="#DCE8E3" stroke-width="6"/>
+        <line x1="1100" y1="412" x2="1100" y2="564" stroke="#DCE8E3" stroke-width="6"/>
+        <line x1="1100" y1="606" x2="1100" y2="900" stroke="#DCE8E3" stroke-width="6"/>
+
+        <!-- Roundabout at main intersection -->
+        <circle cx="849" cy="393" r="38" fill="#E4EFE9"/>
+        <circle cx="849" cy="393" r="26" fill="#D6EBE2"/>
+        <circle cx="849" cy="393" r="12" fill="#C8E3D8"/>
+
+        <!-- Rider dot moving on map -->
+        <circle cx="620" cy="520" r="14" fill="#0A5C4A" opacity="0.15"/>
+        <circle cx="620" cy="520" r="9"  fill="#0A5C4A" opacity="0.3"/>
+        <circle cx="620" cy="520" r="5"  fill="#0A5C4A"/>
+        <circle cx="620" cy="520" r="2"  fill="white"/>
+
+        <!-- Destination pin -->
+        <ellipse cx="760" cy="300" rx="6" ry="3" fill="rgba(0,0,0,0.1)"/>
+        <path d="M760 272 C751 272 745 278 745 285 C745 295 760 300 760 300 C760 300 775 295 775 285 C775 278 769 272 760 272Z" fill="#0A5C4A"/>
+        <circle cx="760" cy="285" r="5" fill="white"/>
+
+        <!-- Route dashed line -->
+        <polyline points="620,520 620,393 760,393 760,300" stroke="#0A5C4A" stroke-width="3" fill="none" stroke-dasharray="8 6" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+      </svg>
+    </div>
+    <div class="hero-map-overlay"></div>
     <div class="hero-content">
       <div class="hero-badge">
         <div class="badge-dot"></div>
