@@ -86,6 +86,7 @@
     background: var(--teal-light);
     color: var(--green);
   }
+  .nav-top-row { display: contents; }
   .nav-right { display: flex; align-items: center; gap: 10px; }
   .lang-btn {
     background: none; border: 1.5px solid var(--teal-mid);
@@ -548,8 +549,39 @@
     .about-grid, .contact-body { grid-template-columns: 1fr; }
     .form-row { grid-template-columns: 1fr; }
     .float-card { display: none; }
-    nav { padding: 0 4%; }
-    .nav-links { display: none; }
+
+    /* Nav: stack into two rows */
+    nav {
+      padding: 0;
+      flex-direction: column;
+      align-items: stretch;
+      height: auto;
+    }
+    .nav-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 4%;
+      height: 56px;
+    }
+    .nav-links {
+      display: flex !important;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      border-top: 1px solid rgba(10,92,74,0.07);
+      padding: 0 4%;
+      gap: 4px;
+    }
+    .nav-links::-webkit-scrollbar { display: none; }
+    .nav-links li { flex-shrink: 0; }
+    .nav-links a {
+      font-size: 0.82rem;
+      padding: 10px 12px;
+      white-space: nowrap;
+    }
+    .cta-nav { display: none; }
+    :root { --nav-h: 100px; }
   }
   @media (max-width: 600px) {
     .trust-strip { gap: 24px; }
@@ -566,20 +598,22 @@
 
 <!-- NAV -->
 <nav id="main-nav">
-  <a class="nav-logo" href="#" onclick="showPage('home')">
-    <div class="logo-mark">و</div>
-    <span id="logo-text">Wasel</span>
-  </a>
+  <div class="nav-top-row">
+    <a class="nav-logo" href="#" onclick="showPage('home')">
+      <div class="logo-mark">و</div>
+      <span id="logo-text">Wasel</span>
+    </a>
+    <div class="nav-right">
+      <button class="lang-btn" id="lang-toggle" onclick="toggleLang()">عربي</button>
+      <a class="cta-nav" href="#" data-en="Download App" data-ar="حمّل التطبيق">Download App</a>
+    </div>
+  </div>
   <ul class="nav-links" id="nav-links">
     <li><a onclick="showPage('home')" data-page="home" data-en="Home" data-ar="الرئيسية">Home</a></li>
     <li><a onclick="showPage('about')" data-page="about" data-en="About" data-ar="عن واصل">About</a></li>
     <li><a onclick="showPage('how')" data-page="how" data-en="How It Works" data-ar="كيف يعمل">How It Works</a></li>
     <li><a onclick="showPage('contact')" data-page="contact" data-en="Contact" data-ar="تواصل معنا">Contact</a></li>
   </ul>
-  <div class="nav-right">
-    <button class="lang-btn" id="lang-toggle" onclick="toggleLang()">عربي</button>
-    <a class="cta-nav" href="#" data-en="Download App" data-ar="حمّل التطبيق">Download App</a>
-  </div>
 </nav>
 
 <!-- ═══════════════ HOME ═══════════════ -->
