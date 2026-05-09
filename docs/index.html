@@ -3,32 +3,681 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Wasel — thewasel.com</title>
+  <title>Wasel — Fast Delivery Across Riyadh</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: #0A5C4A;
-      color: #fff;
+      background: #F0F7F4;
+      color: #0D1F18;
       min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Map grid background ── */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(10, 92, 74, 0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(10, 92, 74, 0.07) 1px, transparent 1px),
+        linear-gradient(rgba(10, 92, 74, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(10, 92, 74, 0.035) 1px, transparent 1px);
+      background-size: 80px 80px, 80px 80px, 20px 20px, 20px 20px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Road overlays ── */
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(10, 92, 74, 0.13) 3px, transparent 3px),
+        linear-gradient(90deg, rgba(10, 92, 74, 0.13) 3px, transparent 3px);
+      background-size: 240px 240px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    nav {
+      position: relative;
+      z-index: 10;
       display: flex;
-      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 48px;
+      background: rgba(240, 247, 244, 0.88);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(10, 92, 74, 0.08);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .nav-logo-icon {
+      width: 38px;
+      height: 38px;
+      background: #0A5C4A;
+      border-radius: 10px;
+      display: flex;
       align-items: center;
       justify-content: center;
-      gap: 24px;
-      padding: 40px 24px;
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      font-family: "Segoe UI", sans-serif;
     }
-    .arabic { font-size: 52px; font-weight: 700; direction: rtl; }
-    .english { font-size: 13px; letter-spacing: 4px; text-transform: uppercase; opacity: 0.7; }
-    .tagline { font-size: 18px; opacity: 0.85; text-align: center; max-width: 320px; line-height: 1.6; }
-    a { color: rgba(255,255,255,0.6); font-size: 14px; text-decoration: underline; }
-    a:hover { color: #fff; }
+
+    .nav-logo-text {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0A5C4A;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: #2D4038;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .nav-links a:hover { color: #0A5C4A; }
+    .nav-links a.active { color: #0A5C4A; font-weight: 700; }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .btn-lang {
+      border: 1.5px solid #0A5C4A;
+      background: transparent;
+      color: #0A5C4A;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
+    .btn-download-nav {
+      background: #0A5C4A;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 10px 22px;
+      border-radius: 22px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-download-nav:hover { background: #0d7a61; }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 80px 48px 60px;
+      min-height: calc(100vh - 79px);
+      gap: 40px;
+    }
+
+    .hero-left {
+      flex: 1;
+      max-width: 520px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(10, 92, 74, 0.1);
+      color: #0A5C4A;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 7px 14px;
+      border-radius: 20px;
+      margin-bottom: 28px;
+    }
+
+    .badge-dot {
+      width: 7px;
+      height: 7px;
+      background: #12967A;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.3); }
+    }
+
+    .hero-headline {
+      font-size: 58px;
+      font-weight: 900;
+      line-height: 1.08;
+      color: #0D1F18;
+      margin-bottom: 24px;
+    }
+
+    .hero-headline span {
+      color: #0A5C4A;
+    }
+
+    .hero-sub {
+      font-size: 17px;
+      color: #4A5E56;
+      line-height: 1.7;
+      margin-bottom: 40px;
+      max-width: 420px;
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    /* App Store badge */
+    .btn-store {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #000;
+      color: #fff;
+      text-decoration: none;
+      padding: 12px 20px;
+      border-radius: 14px;
+      transition: opacity 0.2s;
+    }
+
+    .btn-store:hover { opacity: 0.85; }
+
+    .btn-store .store-label {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+    }
+
+    .btn-store .store-sub {
+      font-size: 10px;
+      font-weight: 400;
+      opacity: 0.85;
+      letter-spacing: 0.3px;
+    }
+
+    .btn-store .store-name {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .btn-store.google {
+      background: #1a1a1a;
+    }
+
+    /* ── Hero right: phone mockup ── */
+    .hero-right {
+      position: relative;
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      max-width: 560px;
+    }
+
+    .float-card {
+      position: absolute;
+      background: #fff;
+      border-radius: 16px;
+      padding: 14px 18px;
+      box-shadow: 0 8px 32px rgba(10,92,74,0.12);
+      font-size: 13px;
+      color: #2D4038;
+    }
+
+    .float-card .card-label { font-size: 11px; color: #7A8B82; margin-bottom: 3px; }
+    .float-card .card-value { font-size: 22px; font-weight: 800; color: #0A5C4A; }
+
+    .float-eta { top: 38%; left: -20px; }
+    .float-deliveries { bottom: 18%; right: -20px; }
+
+    .phone-frame {
+      width: 260px;
+      background: #0D1F18;
+      border-radius: 42px;
+      padding: 14px;
+      box-shadow: 0 32px 80px rgba(10,92,74,0.25), 0 0 0 1px rgba(255,255,255,0.06);
+    }
+
+    .phone-screen {
+      border-radius: 30px;
+      overflow: hidden;
+      background: #E8F4F0;
+    }
+
+    .phone-header {
+      background: #0A5C4A;
+      padding: 16px 18px 14px;
+      color: #fff;
+    }
+
+    .phone-header .ph-label { font-size: 11px; opacity: 0.7; }
+    .phone-header .ph-order { font-size: 15px; font-weight: 700; margin-top: 2px; }
+
+    /* Map inside phone */
+    .phone-map {
+      position: relative;
+      height: 220px;
+      background: #D4EBE3;
+      overflow: hidden;
+    }
+
+    .phone-map svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .phone-footer {
+      background: #fff;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      color: #2D4038;
+      font-weight: 600;
+    }
+
+    .live-badge {
+      background: #12967A;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 10px;
+    }
+
+    /* ── Sections ── */
+    section {
+      position: relative;
+      z-index: 1;
+    }
+
+    .features {
+      padding: 80px 48px;
+      background: rgba(255,255,255,0.6);
+      backdrop-filter: blur(8px);
+    }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #12967A;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: 38px;
+      font-weight: 900;
+      color: #0D1F18;
+      margin-bottom: 48px;
+      max-width: 480px;
+      line-height: 1.15;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .feature-card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 28px;
+      border: 1px solid rgba(10,92,74,0.08);
+    }
+
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      background: rgba(10,92,74,0.08);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    .feature-card h3 { font-size: 17px; font-weight: 700; color: #0D1F18; margin-bottom: 8px; }
+    .feature-card p { font-size: 14px; color: #4A5E56; line-height: 1.6; }
+
+    /* ── How it works ── */
+    .how {
+      padding: 80px 48px;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-top: 48px;
+    }
+
+    .step {
+      text-align: center;
+    }
+
+    .step-num {
+      width: 52px;
+      height: 52px;
+      background: #0A5C4A;
+      color: #fff;
+      font-size: 20px;
+      font-weight: 800;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+
+    .step h3 { font-size: 16px; font-weight: 700; color: #0D1F18; margin-bottom: 8px; }
+    .step p { font-size: 14px; color: #4A5E56; line-height: 1.6; }
+
+    /* ── CTA section ── */
+    .cta-section {
+      background: #0A5C4A;
+      padding: 80px 48px;
+      text-align: center;
+    }
+
+    .cta-section h2 { font-size: 42px; font-weight: 900; color: #fff; margin-bottom: 14px; }
+    .cta-section p { font-size: 18px; color: rgba(255,255,255,0.75); margin-bottom: 36px; }
+
+    .cta-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+    .btn-store.light {
+      background: rgba(255,255,255,0.12);
+      border: 1.5px solid rgba(255,255,255,0.25);
+    }
+
+    .btn-store.light:hover { background: rgba(255,255,255,0.2); }
+
+    /* ── Footer ── */
+    footer {
+      position: relative;
+      z-index: 1;
+      background: #0D1F18;
+      color: rgba(255,255,255,0.5);
+      padding: 32px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 14px;
+    }
+
+    footer a { color: rgba(255,255,255,0.5); text-decoration: underline; }
+    footer a:hover { color: #fff; }
+
+    @media (max-width: 900px) {
+      nav { padding: 16px 24px; }
+      .nav-links { display: none; }
+      .hero { flex-direction: column; padding: 48px 24px; text-align: center; min-height: auto; }
+      .hero-headline { font-size: 38px; }
+      .hero-sub { margin: 0 auto 32px; }
+      .hero-ctas { justify-content: center; }
+      .hero-right { width: 100%; }
+      .float-eta { left: 0; }
+      .float-deliveries { right: 0; }
+      .features { padding: 48px 24px; }
+      .features-grid { grid-template-columns: 1fr; }
+      .how { padding: 48px 24px; }
+      .steps { grid-template-columns: repeat(2, 1fr); }
+      .cta-section { padding: 48px 24px; }
+      .cta-section h2 { font-size: 28px; }
+      footer { flex-direction: column; gap: 12px; text-align: center; padding: 24px; }
+    }
   </style>
 </head>
 <body>
-  <div class="arabic">واصل</div>
-  <div class="english">Wasel</div>
-  <p class="tagline">Fast, tracked deliveries across Riyadh.</p>
-  <a href="privacy.html">Privacy Policy</a>
+
+<nav>
+  <a href="/" class="nav-logo">
+    <div class="nav-logo-icon">و</div>
+    <span class="nav-logo-text">Wasel</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#" class="active">Home</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nav-actions">
+    <button class="btn-lang">عربي</button>
+    <a href="#download" class="btn-download-nav">Download App</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-left">
+    <div class="badge">
+      <span class="badge-dot"></span>
+      Now Live in Riyadh
+    </div>
+    <h1 class="hero-headline">
+      Delivery that moves<br>
+      <span>as fast as you do.</span>
+    </h1>
+    <p class="hero-sub">
+      Wasel connects you with nearby independent riders who pick up and deliver your packages across Riyadh — fast, trackable, and always on time.
+    </p>
+    <div class="hero-ctas" id="download">
+      <!-- App Store -->
+      <a href="#" class="btn-store">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98l-.09.06c-.22.14-2.2 1.28-2.18 3.81.03 3.02 2.65 4.03 2.68 4.04l-.05.27zM13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+        </svg>
+        <div class="store-label">
+          <span class="store-sub">Download on the</span>
+          <span class="store-name">App Store</span>
+        </div>
+      </a>
+      <!-- Google Play -->
+      <a href="#" class="btn-store google">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3.18 1.09C2.77 1.52 2.5 2.18 2.5 3.04v17.92c0 .86.27 1.52.69 1.94l.1.1L13.43 12.5v-.28L3.28.99l-.1.1z" fill="#EA4335"/>
+          <path d="M17.12 16.19l-3.69-3.69v-.28l3.69-3.69.08.05 4.37 2.48c1.25.71 1.25 1.87 0 2.58l-4.37 2.48-.08.07z" fill="#FBBC04"/>
+          <path d="M17.2 16.12L13.43 12.5 3.18 22.9c.41.44 1.09.49 1.86.05l12.16-6.83" fill="#34A853"/>
+          <path d="M17.2 7.88L5.04 1.05C4.27.61 3.59.66 3.18 1.1L13.43 11.5l3.77-3.62z" fill="#4285F4"/>
+        </svg>
+        <div class="store-label">
+          <span class="store-sub">Get it on</span>
+          <span class="store-name">Google Play</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="float-card float-eta">
+      <div class="card-label">Rider ETA</div>
+      <div class="card-value">4 min</div>
+    </div>
+
+    <div class="phone-frame">
+      <div class="phone-screen">
+        <div class="phone-header">
+          <div class="ph-label">🟠 Live tracking</div>
+          <div class="ph-order">Order #2841</div>
+        </div>
+        <div class="phone-map">
+          <svg viewBox="0 0 232 220" xmlns="http://www.w3.org/2000/svg">
+            <!-- Grid streets -->
+            <rect width="232" height="220" fill="#D4EBE3"/>
+            <!-- Horizontal roads -->
+            <rect x="0" y="54" width="232" height="9" fill="#B8D9CE" rx="0"/>
+            <rect x="0" y="108" width="232" height="9" fill="#B8D9CE" rx="0"/>
+            <rect x="0" y="162" width="232" height="9" fill="#B8D9CE" rx="0"/>
+            <!-- Vertical roads -->
+            <rect x="54" y="0" width="9" height="220" fill="#B8D9CE" rx="0"/>
+            <rect x="116" y="0" width="9" height="220" fill="#B8D9CE" rx="0"/>
+            <rect x="178" y="0" width="9" height="220" fill="#B8D9CE" rx="0"/>
+            <!-- Road dashes -->
+            <line x1="0" y1="58.5" x2="232" y2="58.5" stroke="rgba(255,255,255,0.5)" stroke-width="1" stroke-dasharray="8 6"/>
+            <line x1="0" y1="112.5" x2="232" y2="112.5" stroke="rgba(255,255,255,0.5)" stroke-width="1" stroke-dasharray="8 6"/>
+            <line x1="58.5" y1="0" x2="58.5" y2="220" stroke="rgba(255,255,255,0.5)" stroke-width="1" stroke-dasharray="8 6"/>
+            <line x1="120.5" y1="0" x2="120.5" y2="220" stroke="rgba(255,255,255,0.5)" stroke-width="1" stroke-dasharray="8 6"/>
+            <!-- Rider dot -->
+            <circle cx="90" cy="108" r="12" fill="#0A5C4A" opacity="0.2"/>
+            <circle cx="90" cy="108" r="8" fill="#0A5C4A"/>
+            <circle cx="90" cy="108" r="4" fill="#fff"/>
+            <!-- Destination pin -->
+            <ellipse cx="150" cy="77" rx="5" ry="3" fill="rgba(0,0,0,0.15)"/>
+            <path d="M150 48 C143 48 138 53 138 60 C138 70 150 77 150 77 C150 77 162 70 162 60 C162 53 157 48 150 48Z" fill="#0A5C4A"/>
+            <circle cx="150" cy="60" r="5" fill="#fff"/>
+            <!-- Route line -->
+            <polyline points="90,108 90,58 150,58 150,74" stroke="#0A5C4A" stroke-width="2.5" stroke-dasharray="5 4" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="phone-footer">
+          <span>On the way</span>
+          <span class="live-badge">Live</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="float-card float-deliveries">
+      <div class="card-label">Today's deliveries</div>
+      <div class="card-value">1,240+</div>
+    </div>
+  </div>
+</section>
+
+<section class="features" id="about">
+  <div class="section-label">Why Wasel</div>
+  <div class="section-title">Built for speed, designed for Riyadh.</div>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#0A5C4A"/>
+        </svg>
+      </div>
+      <h3>Live GPS Tracking</h3>
+      <p>Watch your rider move in real time. Know exactly when your package arrives.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm4.24 16L12 15.45 7.77 18l1.12-4.81-3.73-3.23 4.92-.42L12 5l1.92 4.53 4.92.42-3.73 3.23L16.23 18z" fill="#0A5C4A"/>
+        </svg>
+      </div>
+      <h3>Instant Matching</h3>
+      <p>Our algorithm finds the nearest available rider and dispatches them in seconds.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z" fill="#0A5C4A"/>
+        </svg>
+      </div>
+      <h3>Secure Payments</h3>
+      <p>Pay safely by card via Stripe. No card numbers stored on our servers.</p>
+    </div>
+  </div>
+</section>
+
+<section class="how" id="how">
+  <div class="section-label">How It Works</div>
+  <div class="section-title">Four steps to delivery.</div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <h3>Enter Addresses</h3>
+      <p>Add your pickup and drop-off location in the app.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <h3>Get Matched</h3>
+      <p>We instantly assign the nearest available rider to your order.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <h3>Track Live</h3>
+      <p>Follow your rider on the map in real time with live ETA updates.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <h3>Delivered</h3>
+      <p>Package arrives. You get a notification and delivery confirmation.</p>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <h2>Ready to send?</h2>
+  <p>Download Wasel and place your first delivery in under a minute.</p>
+  <div class="cta-buttons">
+    <a href="#" class="btn-store light">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98l-.09.06c-.22.14-2.2 1.28-2.18 3.81.03 3.02 2.65 4.03 2.68 4.04l-.05.27zM13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+      </svg>
+      <div class="store-label">
+        <span class="store-sub">Download on the</span>
+        <span class="store-name">App Store</span>
+      </div>
+    </a>
+    <a href="#" class="btn-store light">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3.18 1.09C2.77 1.52 2.5 2.18 2.5 3.04v17.92c0 .86.27 1.52.69 1.94l.1.1L13.43 12.5v-.28L3.28.99l-.1.1z" fill="white"/>
+        <path d="M17.12 16.19l-3.69-3.69v-.28l3.69-3.69.08.05 4.37 2.48c1.25.71 1.25 1.87 0 2.58l-4.37 2.48-.08.07z" fill="white"/>
+        <path d="M17.2 16.12L13.43 12.5 3.18 22.9c.41.44 1.09.49 1.86.05l12.16-6.83" fill="white"/>
+        <path d="M17.2 7.88L5.04 1.05C4.27.61 3.59.66 3.18 1.1L13.43 11.5l3.77-3.62z" fill="white"/>
+      </svg>
+      <div class="store-label">
+        <span class="store-sub">Get it on</span>
+        <span class="store-name">Google Play</span>
+      </div>
+    </a>
+  </div>
+</section>
+
+<footer id="contact">
+  <span>© 2026 Wasel. All rights reserved.</span>
+  <div style="display:flex;gap:24px;align-items:center;">
+    <a href="privacy.html">Privacy Policy</a>
+    <a href="mailto:faisalzafar52@gmail.com">Contact</a>
+  </div>
+</footer>
+
 </body>
 </html>
