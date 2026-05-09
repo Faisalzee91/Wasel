@@ -9,38 +9,23 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: #F0F7F4;
+      background: #EDF4F0;
       color: #0D1F18;
       min-height: 100vh;
       overflow-x: hidden;
     }
 
-    /* ── Map grid background ── */
-    body::before {
-      content: "";
+    /* ── Realistic map background ── */
+    .map-bg {
       position: fixed;
       inset: 0;
-      background-image:
-        linear-gradient(rgba(10, 92, 74, 0.07) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(10, 92, 74, 0.07) 1px, transparent 1px),
-        linear-gradient(rgba(10, 92, 74, 0.035) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(10, 92, 74, 0.035) 1px, transparent 1px);
-      background-size: 80px 80px, 80px 80px, 20px 20px, 20px 20px;
-      pointer-events: none;
       z-index: 0;
+      overflow: hidden;
     }
 
-    /* ── Road overlays ── */
-    body::after {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(10, 92, 74, 0.13) 3px, transparent 3px),
-        linear-gradient(90deg, rgba(10, 92, 74, 0.13) 3px, transparent 3px);
-      background-size: 240px 240px;
-      pointer-events: none;
-      z-index: 0;
+    .map-bg svg {
+      width: 100%;
+      height: 100%;
     }
 
     nav {
@@ -50,9 +35,9 @@
       align-items: center;
       justify-content: space-between;
       padding: 20px 48px;
-      background: rgba(240, 247, 244, 0.88);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(10, 92, 74, 0.08);
+      background: rgba(237, 244, 240, 0.85);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(10, 92, 74, 0.09);
     }
 
     .nav-logo {
@@ -73,7 +58,6 @@
       font-size: 20px;
       font-weight: 700;
       color: #fff;
-      font-family: "Segoe UI", sans-serif;
     }
 
     .nav-logo-text {
@@ -124,8 +108,6 @@
       padding: 10px 22px;
       border-radius: 22px;
       text-decoration: none;
-      border: none;
-      cursor: pointer;
     }
 
     .btn-download-nav:hover { background: #0d7a61; }
@@ -183,9 +165,7 @@
       margin-bottom: 24px;
     }
 
-    .hero-headline span {
-      color: #0A5C4A;
-    }
+    .hero-headline span { color: #0A5C4A; }
 
     .hero-sub {
       font-size: 17px;
@@ -201,7 +181,6 @@
       flex-wrap: wrap;
     }
 
-    /* App Store badge */
     .btn-store {
       display: inline-flex;
       align-items: center;
@@ -209,7 +188,7 @@
       background: #000;
       color: #fff;
       text-decoration: none;
-      padding: 12px 20px;
+      padding: 11px 20px;
       border-radius: 14px;
       transition: opacity 0.2s;
     }
@@ -226,7 +205,6 @@
       font-size: 10px;
       font-weight: 400;
       opacity: 0.85;
-      letter-spacing: 0.3px;
     }
 
     .btn-store .store-name {
@@ -235,18 +213,16 @@
       letter-spacing: -0.3px;
     }
 
-    .btn-store.google {
-      background: #1a1a1a;
-    }
+    .btn-store.google { background: #1a1a1a; }
 
-    /* ── Hero right: phone mockup ── */
+    /* ── Phone mockup ── */
     .hero-right {
       position: relative;
       flex: 1;
       display: flex;
       justify-content: center;
       align-items: center;
-      max-width: 560px;
+      max-width: 480px;
     }
 
     .float-card {
@@ -254,85 +230,154 @@
       background: #fff;
       border-radius: 16px;
       padding: 14px 18px;
-      box-shadow: 0 8px 32px rgba(10,92,74,0.12);
+      box-shadow: 0 8px 32px rgba(10,92,74,0.14);
       font-size: 13px;
       color: #2D4038;
+      z-index: 2;
     }
 
     .float-card .card-label { font-size: 11px; color: #7A8B82; margin-bottom: 3px; }
     .float-card .card-value { font-size: 22px; font-weight: 800; color: #0A5C4A; }
 
-    .float-eta { top: 38%; left: -20px; }
-    .float-deliveries { bottom: 18%; right: -20px; }
+    .float-eta { top: 32%; left: -10px; }
+    .float-deliveries { bottom: 14%; right: -10px; }
+
+    /* Phone frame - proper portrait */
+    .phone-wrap {
+      position: relative;
+      z-index: 1;
+    }
 
     .phone-frame {
-      width: 260px;
-      background: #0D1F18;
-      border-radius: 42px;
-      padding: 14px;
-      box-shadow: 0 32px 80px rgba(10,92,74,0.25), 0 0 0 1px rgba(255,255,255,0.06);
+      width: 248px;
+      height: 520px;
+      background: #111;
+      border-radius: 44px;
+      padding: 12px;
+      box-shadow:
+        0 40px 100px rgba(10,30,20,0.28),
+        0 0 0 1px rgba(255,255,255,0.07),
+        inset 0 0 0 1px rgba(255,255,255,0.04);
+      position: relative;
+    }
+
+    /* Side buttons */
+    .phone-frame::before {
+      content: "";
+      position: absolute;
+      right: -3px;
+      top: 100px;
+      width: 3px;
+      height: 60px;
+      background: #333;
+      border-radius: 0 2px 2px 0;
+      box-shadow: 0 80px 0 #333;
+    }
+
+    .phone-frame::after {
+      content: "";
+      position: absolute;
+      left: -3px;
+      top: 80px;
+      width: 3px;
+      height: 36px;
+      background: #333;
+      border-radius: 2px 0 0 2px;
+      box-shadow: 0 50px 0 #333, 0 96px 0 #333;
     }
 
     .phone-screen {
-      border-radius: 30px;
+      width: 100%;
+      height: 100%;
+      border-radius: 34px;
       overflow: hidden;
       background: #E8F4F0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Dynamic island */
+    .phone-island {
+      position: absolute;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 26px;
+      background: #111;
+      border-radius: 20px;
+      z-index: 5;
     }
 
     .phone-header {
       background: #0A5C4A;
-      padding: 16px 18px 14px;
+      padding: 42px 16px 14px;
       color: #fff;
+      flex-shrink: 0;
     }
 
-    .phone-header .ph-label { font-size: 11px; opacity: 0.7; }
-    .phone-header .ph-order { font-size: 15px; font-weight: 700; margin-top: 2px; }
+    .phone-header .ph-label {
+      font-size: 10px;
+      opacity: 0.65;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
 
-    /* Map inside phone */
+    .ph-dot {
+      width: 6px;
+      height: 6px;
+      background: #FF9500;
+      border-radius: 50%;
+    }
+
+    .phone-header .ph-order {
+      font-size: 16px;
+      font-weight: 800;
+      margin-top: 3px;
+    }
+
+    /* Realistic map inside phone */
     .phone-map {
+      flex: 1;
       position: relative;
-      height: 220px;
-      background: #D4EBE3;
       overflow: hidden;
     }
 
     .phone-map svg {
-      position: absolute;
-      inset: 0;
       width: 100%;
       height: 100%;
     }
 
     .phone-footer {
       background: #fff;
-      padding: 12px 18px;
+      padding: 10px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 13px;
+      font-size: 12px;
       color: #2D4038;
       font-weight: 600;
+      flex-shrink: 0;
+      border-top: 1px solid #E8F0ED;
     }
 
     .live-badge {
       background: #12967A;
       color: #fff;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 700;
       padding: 4px 10px;
       border-radius: 10px;
     }
 
-    /* ── Sections ── */
-    section {
-      position: relative;
-      z-index: 1;
-    }
+    /* ── Features section ── */
+    section { position: relative; z-index: 1; }
 
     .features {
       padding: 80px 48px;
-      background: rgba(255,255,255,0.6);
-      backdrop-filter: blur(8px);
+      background: rgba(255,255,255,0.72);
+      backdrop-filter: blur(12px);
     }
 
     .section-label {
@@ -380,10 +425,7 @@
     .feature-card h3 { font-size: 17px; font-weight: 700; color: #0D1F18; margin-bottom: 8px; }
     .feature-card p { font-size: 14px; color: #4A5E56; line-height: 1.6; }
 
-    /* ── How it works ── */
-    .how {
-      padding: 80px 48px;
-    }
+    .how { padding: 80px 48px; }
 
     .steps {
       display: grid;
@@ -392,9 +434,7 @@
       margin-top: 48px;
     }
 
-    .step {
-      text-align: center;
-    }
+    .step { text-align: center; }
 
     .step-num {
       width: 52px;
@@ -413,7 +453,6 @@
     .step h3 { font-size: 16px; font-weight: 700; color: #0D1F18; margin-bottom: 8px; }
     .step p { font-size: 14px; color: #4A5E56; line-height: 1.6; }
 
-    /* ── CTA section ── */
     .cta-section {
       background: #0A5C4A;
       padding: 80px 48px;
@@ -422,7 +461,6 @@
 
     .cta-section h2 { font-size: 42px; font-weight: 900; color: #fff; margin-bottom: 14px; }
     .cta-section p { font-size: 18px; color: rgba(255,255,255,0.75); margin-bottom: 36px; }
-
     .cta-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
 
     .btn-store.light {
@@ -432,7 +470,6 @@
 
     .btn-store.light:hover { background: rgba(255,255,255,0.2); }
 
-    /* ── Footer ── */
     footer {
       position: relative;
       z-index: 1;
@@ -452,12 +489,12 @@
       nav { padding: 16px 24px; }
       .nav-links { display: none; }
       .hero { flex-direction: column; padding: 48px 24px; text-align: center; min-height: auto; }
-      .hero-headline { font-size: 38px; }
+      .hero-headline { font-size: 36px; }
       .hero-sub { margin: 0 auto 32px; }
       .hero-ctas { justify-content: center; }
       .hero-right { width: 100%; }
-      .float-eta { left: 0; }
-      .float-deliveries { right: 0; }
+      .float-eta { left: 4px; }
+      .float-deliveries { right: 4px; }
       .features { padding: 48px 24px; }
       .features-grid { grid-template-columns: 1fr; }
       .how { padding: 48px 24px; }
@@ -469,6 +506,138 @@
   </style>
 </head>
 <body>
+
+<!-- Realistic city map background -->
+<div class="map-bg">
+  <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <!-- Base land -->
+    <rect width="1440" height="900" fill="#EDF4F0"/>
+
+    <!-- ── City blocks (buildings/parcels) ── -->
+    <!-- Row 1 -->
+    <rect x="0" y="0" width="180" height="110" fill="#D9EDE5" rx="2"/>
+    <rect x="200" y="0" width="140" height="110" fill="#D9EDE5" rx="2"/>
+    <rect x="360" y="0" width="100" height="110" fill="#D5EBE2" rx="2"/>
+    <rect x="480" y="0" width="160" height="110" fill="#D9EDE5" rx="2"/>
+    <rect x="660" y="0" width="120" height="110" fill="#D5EBE2" rx="2"/>
+    <rect x="800" y="0" width="200" height="110" fill="#D9EDE5" rx="2"/>
+    <rect x="1020" y="0" width="130" height="110" fill="#D5EBE2" rx="2"/>
+    <rect x="1170" y="0" width="270" height="110" fill="#D9EDE5" rx="2"/>
+
+    <!-- Row 2 -->
+    <rect x="0" y="170" width="120" height="130" fill="#D9EDE5" rx="2"/>
+    <rect x="140" y="170" width="220" height="130" fill="#D5EBE2" rx="2"/>
+    <rect x="380" y="170" width="80" height="130" fill="#D9EDE5" rx="2"/>
+    <rect x="480" y="170" width="160" height="60" fill="#D5EBE2" rx="2"/>
+    <rect x="480" y="250" width="160" height="50" fill="#D9EDE5" rx="2"/>
+    <rect x="660" y="170" width="120" height="130" fill="#D5EBE2" rx="2"/>
+    <rect x="800" y="170" width="90" height="130" fill="#D9EDE5" rx="2"/>
+    <rect x="910" y="170" width="90" height="60" fill="#D5EBE2" rx="2"/>
+    <rect x="910" y="250" width="90" height="50" fill="#D9EDE5" rx="2"/>
+    <rect x="1020" y="170" width="130" height="130" fill="#D5EBE2" rx="2"/>
+    <rect x="1170" y="170" width="160" height="130" fill="#D9EDE5" rx="2"/>
+    <rect x="1350" y="170" width="90" height="130" fill="#D5EBE2" rx="2"/>
+
+    <!-- Park/green area -->
+    <rect x="640" y="155" width="0" height="0" fill="#C8E8D8" rx="4"/>
+
+    <!-- Row 3 -->
+    <rect x="0" y="360" width="200" height="100" fill="#D5EBE2" rx="2"/>
+    <rect x="220" y="360" width="140" height="100" fill="#D9EDE5" rx="2"/>
+    <rect x="380" y="360" width="80" height="100" fill="#D5EBE2" rx="2"/>
+    <rect x="480" y="360" width="80" height="100" fill="#D9EDE5" rx="2"/>
+    <rect x="580" y="360" width="60" height="100" fill="#D5EBE2" rx="2"/>
+    <rect x="660" y="360" width="120" height="100" fill="#D9EDE5" rx="2"/>
+    <rect x="800" y="360" width="180" height="100" fill="#D5EBE2" rx="2"/>
+    <rect x="1000" y="360" width="150" height="100" fill="#D9EDE5" rx="2"/>
+    <rect x="1170" y="360" width="110" height="100" fill="#D5EBE2" rx="2"/>
+    <rect x="1300" y="360" width="140" height="100" fill="#D9EDE5" rx="2"/>
+
+    <!-- Row 4 -->
+    <rect x="0" y="520" width="160" height="120" fill="#D9EDE5" rx="2"/>
+    <rect x="180" y="520" width="180" height="120" fill="#D5EBE2" rx="2"/>
+    <rect x="380" y="520" width="80" height="120" fill="#D9EDE5" rx="2"/>
+    <rect x="480" y="520" width="140" height="50" fill="#D5EBE2" rx="2"/>
+    <rect x="480" y="590" width="140" height="50" fill="#D9EDE5" rx="2"/>
+    <rect x="640" y="520" width="140" height="120" fill="#D5EBE2" rx="2"/>
+    <rect x="800" y="520" width="180" height="120" fill="#D9EDE5" rx="2"/>
+    <rect x="1000" y="520" width="150" height="120" fill="#D5EBE2" rx="2"/>
+    <rect x="1170" y="520" width="110" height="120" fill="#D9EDE5" rx="2"/>
+    <rect x="1300" y="520" width="140" height="120" fill="#D5EBE2" rx="2"/>
+
+    <!-- Row 5 -->
+    <rect x="0" y="700" width="160" height="200" fill="#D5EBE2" rx="2"/>
+    <rect x="180" y="700" width="180" height="200" fill="#D9EDE5" rx="2"/>
+    <rect x="380" y="700" width="80" height="200" fill="#D5EBE2" rx="2"/>
+    <rect x="480" y="700" width="140" height="200" fill="#D9EDE5" rx="2"/>
+    <rect x="640" y="700" width="140" height="200" fill="#D5EBE2" rx="2"/>
+    <rect x="800" y="700" width="180" height="200" fill="#D9EDE5" rx="2"/>
+    <rect x="1000" y="700" width="150" height="200" fill="#D5EBE2" rx="2"/>
+    <rect x="1170" y="700" width="110" height="200" fill="#D9EDE5" rx="2"/>
+    <rect x="1300" y="700" width="140" height="200" fill="#D5EBE2" rx="2"/>
+
+    <!-- ── Small park ── -->
+    <rect x="462" y="152" width="196" height="196" fill="#C4E2D4" rx="4"/>
+    <circle cx="560" cy="250" r="30" fill="#B0D9C6"/>
+    <circle cx="520" cy="220" r="18" fill="#B0D9C6"/>
+    <circle cx="598" cy="275" r="22" fill="#B0D9C6"/>
+
+    <!-- ── Highways (thick, slightly off-white) ── -->
+    <!-- Horizontal highway -->
+    <rect x="0" y="460" width="1440" height="50" fill="#E0EDE8"/>
+    <rect x="0" y="467" width="1440" height="36" fill="#fff" opacity="0.85"/>
+    <!-- Highway markings -->
+    <line x1="0" y1="485" x2="1440" y2="485" stroke="#C8D8D0" stroke-width="1.5" stroke-dasharray="30 20"/>
+
+    <!-- Vertical highway -->
+    <rect x="735" y="0" width="50" height="900" fill="#E0EDE8"/>
+    <rect x="742" y="0" width="36" height="900" fill="#fff" opacity="0.85"/>
+    <line x1="760" y1="0" x2="760" y2="900" stroke="#C8D8D0" stroke-width="1.5" stroke-dasharray="30 20"/>
+
+    <!-- ── Main roads (medium width) ── -->
+    <!-- Horizontal main roads -->
+    <rect x="0" y="120" width="1440" height="36" fill="#E8F2EE"/>
+    <line x1="0" y1="138" x2="430" y2="138" stroke="#C0D4CC" stroke-width="1" stroke-dasharray="16 12"/>
+    <line x1="490" y1="138" x2="1440" y2="138" stroke="#C0D4CC" stroke-width="1" stroke-dasharray="16 12"/>
+
+    <rect x="0" y="310" width="1440" height="36" fill="#E8F2EE"/>
+    <line x1="0" y1="328" x2="1440" y2="328" stroke="#C0D4CC" stroke-width="1" stroke-dasharray="16 12"/>
+
+    <rect x="0" y="650" width="1440" height="36" fill="#E8F2EE"/>
+    <line x1="0" y1="668" x2="1440" y2="668" stroke="#C0D4CC" stroke-width="1" stroke-dasharray="16 12"/>
+
+    <!-- Vertical main roads -->
+    <rect x="160" y="0" width="28" height="900" fill="#E8F2EE"/>
+    <line x1="174" y1="0" x2="174" y2="900" stroke="#C0D4CC" stroke-width="1" stroke-dasharray="16 12"/>
+
+    <rect x="360" y="0" width="28" height="900" fill="#E8F2EE"/>
+    <line x1="374" y1="0" x2="374" y2="900" stroke="#C0D4CC" stroke-width="1" stroke-dasharray="16 12"/>
+
+    <rect x="460" y="0" width="28" height="900" fill="#E8F2EE"/>
+
+    <rect x="640" y="0" width="28" height="900" fill="#E8F2EE"/>
+    <line x1="654" y1="0" x2="654" y2="900" stroke="#C0D4CC" stroke-width="1" stroke-dasharray="16 12"/>
+
+    <rect x="790" y="0" width="28" height="900" fill="#E8F2EE"/>
+    <line x1="804" y1="0" x2="804" y2="900" stroke="#C0D4CC" stroke-width="1" stroke-dasharray="16 12"/>
+
+    <rect x="1000" y="0" width="28" height="900" fill="#E8F2EE"/>
+    <line x1="1014" y1="0" x2="1014" y2="900" stroke="#C0D4CC" stroke-width="1" stroke-dasharray="16 12"/>
+
+    <rect x="1160" y="0" width="28" height="900" fill="#E8F2EE"/>
+    <line x1="1174" y1="0" x2="1174" y2="900" stroke="#C0D4CC" stroke-width="1" stroke-dasharray="16 12"/>
+
+    <rect x="1300" y="0" width="28" height="900" fill="#E8F2EE"/>
+
+    <!-- ── Roundabout at intersection ── -->
+    <circle cx="654" cy="485" r="34" fill="#E8F2EE"/>
+    <circle cx="654" cy="485" r="22" fill="#D4EAE2"/>
+    <circle cx="654" cy="485" r="10" fill="#C4E0D6"/>
+
+    <!-- ── Overlay fade so content is legible ── -->
+    <rect width="1440" height="900" fill="rgba(237,244,240,0.48)"/>
+  </svg>
+</div>
 
 <nav>
   <a href="/" class="nav-logo">
@@ -501,9 +670,8 @@
       Wasel connects you with nearby independent riders who pick up and deliver your packages across Riyadh — fast, trackable, and always on time.
     </p>
     <div class="hero-ctas" id="download">
-      <!-- App Store -->
       <a href="#" class="btn-store">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
           <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98l-.09.06c-.22.14-2.2 1.28-2.18 3.81.03 3.02 2.65 4.03 2.68 4.04l-.05.27zM13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
         </svg>
         <div class="store-label">
@@ -511,9 +679,8 @@
           <span class="store-name">App Store</span>
         </div>
       </a>
-      <!-- Google Play -->
       <a href="#" class="btn-store google">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
           <path d="M3.18 1.09C2.77 1.52 2.5 2.18 2.5 3.04v17.92c0 .86.27 1.52.69 1.94l.1.1L13.43 12.5v-.28L3.28.99l-.1.1z" fill="#EA4335"/>
           <path d="M17.12 16.19l-3.69-3.69v-.28l3.69-3.69.08.05 4.37 2.48c1.25.71 1.25 1.87 0 2.58l-4.37 2.48-.08.07z" fill="#FBBC04"/>
           <path d="M17.2 16.12L13.43 12.5 3.18 22.9c.41.44 1.09.49 1.86.05l12.16-6.83" fill="#34A853"/>
@@ -533,44 +700,96 @@
       <div class="card-value">4 min</div>
     </div>
 
-    <div class="phone-frame">
-      <div class="phone-screen">
-        <div class="phone-header">
-          <div class="ph-label">🟠 Live tracking</div>
-          <div class="ph-order">Order #2841</div>
-        </div>
-        <div class="phone-map">
-          <svg viewBox="0 0 232 220" xmlns="http://www.w3.org/2000/svg">
-            <!-- Grid streets -->
-            <rect width="232" height="220" fill="#D4EBE3"/>
-            <!-- Horizontal roads -->
-            <rect x="0" y="54" width="232" height="9" fill="#B8D9CE" rx="0"/>
-            <rect x="0" y="108" width="232" height="9" fill="#B8D9CE" rx="0"/>
-            <rect x="0" y="162" width="232" height="9" fill="#B8D9CE" rx="0"/>
-            <!-- Vertical roads -->
-            <rect x="54" y="0" width="9" height="220" fill="#B8D9CE" rx="0"/>
-            <rect x="116" y="0" width="9" height="220" fill="#B8D9CE" rx="0"/>
-            <rect x="178" y="0" width="9" height="220" fill="#B8D9CE" rx="0"/>
-            <!-- Road dashes -->
-            <line x1="0" y1="58.5" x2="232" y2="58.5" stroke="rgba(255,255,255,0.5)" stroke-width="1" stroke-dasharray="8 6"/>
-            <line x1="0" y1="112.5" x2="232" y2="112.5" stroke="rgba(255,255,255,0.5)" stroke-width="1" stroke-dasharray="8 6"/>
-            <line x1="58.5" y1="0" x2="58.5" y2="220" stroke="rgba(255,255,255,0.5)" stroke-width="1" stroke-dasharray="8 6"/>
-            <line x1="120.5" y1="0" x2="120.5" y2="220" stroke="rgba(255,255,255,0.5)" stroke-width="1" stroke-dasharray="8 6"/>
-            <!-- Rider dot -->
-            <circle cx="90" cy="108" r="12" fill="#0A5C4A" opacity="0.2"/>
-            <circle cx="90" cy="108" r="8" fill="#0A5C4A"/>
-            <circle cx="90" cy="108" r="4" fill="#fff"/>
-            <!-- Destination pin -->
-            <ellipse cx="150" cy="77" rx="5" ry="3" fill="rgba(0,0,0,0.15)"/>
-            <path d="M150 48 C143 48 138 53 138 60 C138 70 150 77 150 77 C150 77 162 70 162 60 C162 53 157 48 150 48Z" fill="#0A5C4A"/>
-            <circle cx="150" cy="60" r="5" fill="#fff"/>
-            <!-- Route line -->
-            <polyline points="90,108 90,58 150,58 150,74" stroke="#0A5C4A" stroke-width="2.5" stroke-dasharray="5 4" fill="none" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <div class="phone-footer">
-          <span>On the way</span>
-          <span class="live-badge">Live</span>
+    <div class="phone-wrap">
+      <div class="phone-frame">
+        <div class="phone-island"></div>
+        <div class="phone-screen">
+          <div class="phone-header">
+            <div class="ph-label"><span class="ph-dot"></span> Live tracking</div>
+            <div class="ph-order">Order #2841</div>
+          </div>
+          <div class="phone-map">
+            <!-- Realistic mini map inside phone -->
+            <svg viewBox="0 0 224 290" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+              <!-- Base -->
+              <rect width="224" height="290" fill="#D8EDE5"/>
+
+              <!-- City blocks -->
+              <rect x="0" y="0" width="55" height="70" fill="#C8E4D8" rx="1"/>
+              <rect x="65" y="0" width="65" height="70" fill="#CCE7DB" rx="1"/>
+              <rect x="140" y="0" width="84" height="70" fill="#C8E4D8" rx="1"/>
+
+              <rect x="0" y="90" width="55" height="80" fill="#CCE7DB" rx="1"/>
+              <rect x="65" y="90" width="30" height="38" fill="#C8E4D8" rx="1"/>
+              <rect x="65" y="134" width="30" height="36" fill="#CCE7DB" rx="1"/>
+              <rect x="105" y="90" width="25" height="80" fill="#C8E4D8" rx="1"/>
+              <rect x="140" y="90" width="84" height="80" fill="#CCE7DB" rx="1"/>
+
+              <!-- Park -->
+              <rect x="60" y="82" width="48" height="0" fill="#B8DECA" rx="2"/>
+
+              <rect x="0" y="192" width="55" height="98" fill="#C8E4D8" rx="1"/>
+              <rect x="65" y="192" width="65" height="45" fill="#CCE7DB" rx="1"/>
+              <rect x="65" y="245" width="65" height="45" fill="#C8E4D8" rx="1"/>
+              <rect x="140" y="192" width="84" height="98" fill="#CCE7DB" rx="1"/>
+
+              <!-- Main roads horizontal -->
+              <rect x="0" y="78" width="224" height="10" fill="#EAF3EF"/>
+              <rect x="0" y="180" width="224" height="10" fill="#EAF3EF"/>
+
+              <!-- Main roads vertical -->
+              <rect x="57" y="0" width="8" height="290" fill="#EAF3EF"/>
+              <rect x="132" y="0" width="8" height="290" fill="#EAF3EF"/>
+
+              <!-- Road center dashes -->
+              <line x1="0" y1="83" x2="224" y2="83" stroke="rgba(255,255,255,0.6)" stroke-width="1" stroke-dasharray="10 8"/>
+              <line x1="0" y1="185" x2="224" y2="185" stroke="rgba(255,255,255,0.6)" stroke-width="1" stroke-dasharray="10 8"/>
+              <line x1="61" y1="0" x2="61" y2="290" stroke="rgba(255,255,255,0.6)" stroke-width="1" stroke-dasharray="10 8"/>
+              <line x1="136" y1="0" x2="136" y2="290" stroke="rgba(255,255,255,0.6)" stroke-width="1" stroke-dasharray="10 8"/>
+
+              <!-- Small streets -->
+              <line x1="0" y1="35" x2="57" y2="35" stroke="#C8DED8" stroke-width="4"/>
+              <line x1="65" y1="35" x2="132" y2="35" stroke="#C8DED8" stroke-width="4"/>
+              <line x1="140" y1="35" x2="224" y2="35" stroke="#C8DED8" stroke-width="4"/>
+              <line x1="0" y1="130" x2="57" y2="130" stroke="#C8DED8" stroke-width="4"/>
+              <line x1="65" y1="130" x2="132" y2="130" stroke="#C8DED8" stroke-width="4"/>
+              <line x1="140" y1="130" x2="224" y2="130" stroke="#C8DED8" stroke-width="4"/>
+              <line x1="0" y1="230" x2="57" y2="230" stroke="#C8DED8" stroke-width="4"/>
+              <line x1="65" y1="230" x2="132" y2="230" stroke="#C8DED8" stroke-width="4"/>
+              <line x1="140" y1="230" x2="224" y2="230" stroke="#C8DED8" stroke-width="4"/>
+              <line x1="25" y1="0" x2="25" y2="78" stroke="#C8DED8" stroke-width="4"/>
+              <line x1="25" y1="88" x2="25" y2="180" stroke="#C8DED8" stroke-width="4"/>
+              <line x1="25" y1="190" x2="25" y2="290" stroke="#C8DED8" stroke-width="4"/>
+              <line x1="95" y1="0" x2="95" y2="78" stroke="#C8DED8" stroke-width="4"/>
+              <line x1="95" y1="88" x2="95" y2="180" stroke="#C8DED8" stroke-width="4"/>
+              <line x1="95" y1="190" x2="95" y2="290" stroke="#C8DED8" stroke-width="4"/>
+              <line x1="170" y1="0" x2="170" y2="78" stroke="#C8DED8" stroke-width="4"/>
+              <line x1="170" y1="88" x2="170" y2="180" stroke="#C8DED8" stroke-width="4"/>
+              <line x1="170" y1="190" x2="170" y2="290" stroke="#C8DED8" stroke-width="4"/>
+
+              <!-- Route path -->
+              <polyline points="112,210 112,185 112,83 136,83 136,48" stroke="#0A5C4A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 5" opacity="0.9"/>
+
+              <!-- Rider dot with pulse -->
+              <circle cx="112" cy="210" r="16" fill="#0A5C4A" opacity="0.15"/>
+              <circle cx="112" cy="210" r="10" fill="#0A5C4A" opacity="0.25"/>
+              <circle cx="112" cy="210" r="7" fill="#0A5C4A"/>
+              <circle cx="112" cy="210" r="3.5" fill="#fff"/>
+
+              <!-- Destination pin -->
+              <ellipse cx="136" cy="51" rx="5" ry="2.5" fill="rgba(0,0,0,0.12)"/>
+              <path d="M136 28 C130 28 126 32.5 126 37.5 C126 45 136 51 136 51 C136 51 146 45 146 37.5 C146 32.5 142 28 136 28Z" fill="#0A5C4A"/>
+              <circle cx="136" cy="37.5" r="4.5" fill="#fff"/>
+
+              <!-- Small building labels -->
+              <rect x="72" y="95" width="22" height="10" rx="2" fill="rgba(255,255,255,0.7)"/>
+              <rect x="146" y="20" width="28" height="10" rx="2" fill="rgba(255,255,255,0.7)"/>
+            </svg>
+          </div>
+          <div class="phone-footer">
+            <span>On the way</span>
+            <span class="live-badge">Live</span>
+          </div>
         </div>
       </div>
     </div>
@@ -648,7 +867,7 @@
   <p>Download Wasel and place your first delivery in under a minute.</p>
   <div class="cta-buttons">
     <a href="#" class="btn-store light">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
         <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98l-.09.06c-.22.14-2.2 1.28-2.18 3.81.03 3.02 2.65 4.03 2.68 4.04l-.05.27zM13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
       </svg>
       <div class="store-label">
@@ -657,7 +876,7 @@
       </div>
     </a>
     <a href="#" class="btn-store light">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
         <path d="M3.18 1.09C2.77 1.52 2.5 2.18 2.5 3.04v17.92c0 .86.27 1.52.69 1.94l.1.1L13.43 12.5v-.28L3.28.99l-.1.1z" fill="white"/>
         <path d="M17.12 16.19l-3.69-3.69v-.28l3.69-3.69.08.05 4.37 2.48c1.25.71 1.25 1.87 0 2.58l-4.37 2.48-.08.07z" fill="white"/>
         <path d="M17.2 16.12L13.43 12.5 3.18 22.9c.41.44 1.09.49 1.86.05l12.16-6.83" fill="white"/>
