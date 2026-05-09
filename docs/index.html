@@ -1,888 +1,1078 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Wasel — Fast Delivery Across Riyadh</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: #F5FAF7;
-      color: #0D1F18;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    /* ── Topographic background ── */
-    .topo-bg {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      overflow: hidden;
-      pointer-events: none;
-    }
-
-    .topo-bg svg {
-      width: 100%;
-      height: 100%;
-    }
-
-    /* ── Nav ── */
-    nav {
-      position: relative;
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 20px 56px;
-      background: rgba(245, 250, 247, 0.88);
-      backdrop-filter: blur(14px);
-      border-bottom: 1px solid rgba(10, 92, 74, 0.08);
-    }
-
-    .nav-logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-    }
-
-    .nav-logo-icon {
-      width: 38px;
-      height: 38px;
-      background: #0A5C4A;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      font-weight: 700;
-      color: #fff;
-    }
-
-    .nav-logo-text {
-      font-size: 18px;
-      font-weight: 800;
-      color: #0A5C4A;
-    }
-
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 36px;
-      list-style: none;
-    }
-
-    .nav-links a {
-      color: #2D4038;
-      text-decoration: none;
-      font-size: 15px;
-      font-weight: 500;
-      transition: color 0.2s;
-    }
-
-    .nav-links a:hover,
-    .nav-links a.active { color: #0A5C4A; font-weight: 600; }
-
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .btn-lang {
-      border: 1.5px solid #0A5C4A;
-      background: transparent;
-      color: #0A5C4A;
-      font-size: 14px;
-      font-weight: 600;
-      padding: 8px 16px;
-      border-radius: 20px;
-      cursor: pointer;
-    }
-
-    .btn-download-nav {
-      background: #0A5C4A;
-      color: #fff;
-      font-size: 15px;
-      font-weight: 700;
-      padding: 10px 22px;
-      border-radius: 22px;
-      text-decoration: none;
-      transition: background 0.2s;
-    }
-
-    .btn-download-nav:hover { background: #0c7260; }
-
-    /* ── Hero ── */
-    .hero {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 90px 56px 70px;
-      min-height: calc(100vh - 79px);
-      gap: 40px;
-    }
-
-    .hero-left {
-      flex: 1;
-      max-width: 520px;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(10, 92, 74, 0.09);
-      color: #0A5C4A;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 1.8px;
-      text-transform: uppercase;
-      padding: 7px 14px;
-      border-radius: 20px;
-      margin-bottom: 28px;
-    }
-
-    .badge-dot {
-      width: 7px;
-      height: 7px;
-      background: #12967A;
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.45; transform: scale(1.4); }
-    }
-
-    .hero-headline {
-      font-size: 60px;
-      font-weight: 900;
-      line-height: 1.06;
-      color: #0D1F18;
-      margin-bottom: 22px;
-    }
-
-    .hero-headline span { color: #0A5C4A; }
-
-    .hero-sub {
-      font-size: 17px;
-      color: #4A5E56;
-      line-height: 1.75;
-      margin-bottom: 40px;
-      max-width: 420px;
-    }
-
-    .hero-ctas { display: flex; gap: 14px; flex-wrap: wrap; }
-
-    .btn-store {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      background: #111;
-      color: #fff;
-      text-decoration: none;
-      padding: 11px 20px;
-      border-radius: 14px;
-      transition: opacity 0.2s;
-    }
-
-    .btn-store:hover { opacity: 0.82; }
-
-    .btn-store .store-label { display: flex; flex-direction: column; line-height: 1.2; }
-    .btn-store .store-sub { font-size: 10px; opacity: 0.8; }
-    .btn-store .store-name { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
-
-    /* ── Phone mockup ── */
-    .hero-right {
-      position: relative;
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      max-width: 460px;
-    }
-
-    .float-card {
-      position: absolute;
-      background: #fff;
-      border-radius: 16px;
-      padding: 14px 18px;
-      box-shadow: 0 8px 32px rgba(10,92,74,0.13);
-      z-index: 2;
-    }
-
-    .float-card .card-label { font-size: 11px; color: #7A8B82; margin-bottom: 3px; }
-    .float-card .card-value { font-size: 22px; font-weight: 800; color: #0A5C4A; }
-
-    .float-eta { top: 30%; left: -8px; }
-    .float-deliveries { bottom: 12%; right: -8px; }
-
-    .phone-wrap { position: relative; z-index: 1; }
-
-    .phone-frame {
-      width: 248px;
-      height: 524px;
-      background: #111;
-      border-radius: 46px;
-      padding: 12px;
-      box-shadow:
-        0 48px 100px rgba(10,30,20,0.26),
-        0 0 0 1px rgba(255,255,255,0.06),
-        inset 0 0 0 1px rgba(255,255,255,0.04);
-      position: relative;
-    }
-
-    .phone-frame::before {
-      content: "";
-      position: absolute;
-      right: -3px;
-      top: 108px;
-      width: 3px;
-      height: 62px;
-      background: #2a2a2a;
-      border-radius: 0 3px 3px 0;
-      box-shadow: 0 84px 0 #2a2a2a;
-    }
-
-    .phone-frame::after {
-      content: "";
-      position: absolute;
-      left: -3px;
-      top: 86px;
-      width: 3px;
-      height: 38px;
-      background: #2a2a2a;
-      border-radius: 3px 0 0 3px;
-      box-shadow: 0 52px 0 #2a2a2a, 0 100px 0 #2a2a2a;
-    }
-
-    .phone-screen {
-      width: 100%;
-      height: 100%;
-      border-radius: 36px;
-      overflow: hidden;
-      background: #D8EDE5;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .phone-island {
-      position: absolute;
-      top: 18px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 84px;
-      height: 26px;
-      background: #111;
-      border-radius: 20px;
-      z-index: 5;
-    }
-
-    .phone-header {
-      background: #0A5C4A;
-      padding: 44px 16px 14px;
-      color: #fff;
-      flex-shrink: 0;
-    }
-
-    .phone-header .ph-label {
-      font-size: 10px;
-      opacity: 0.65;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .ph-dot {
-      width: 6px;
-      height: 6px;
-      background: #FF9500;
-      border-radius: 50%;
-    }
-
-    .phone-header .ph-order {
-      font-size: 16px;
-      font-weight: 800;
-      margin-top: 3px;
-    }
-
-    .phone-map {
-      flex: 1;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .phone-map svg {
-      width: 100%;
-      height: 100%;
-    }
-
-    .phone-footer {
-      background: #fff;
-      padding: 10px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 12px;
-      color: #2D4038;
-      font-weight: 600;
-      flex-shrink: 0;
-      border-top: 1px solid #E4EFE9;
-    }
-
-    .live-badge {
-      background: #12967A;
-      color: #fff;
-      font-size: 10px;
-      font-weight: 700;
-      padding: 4px 10px;
-      border-radius: 10px;
-    }
-
-    /* ── Sections ── */
-    section { position: relative; z-index: 1; scroll-margin-top: 79px; }
-
-    /* About */
-    .about {
-      padding: 100px 56px;
-      background: rgba(255,255,255,0.78);
-      backdrop-filter: blur(12px);
-      border-top: 1px solid rgba(10,92,74,0.07);
-    }
-
-    .section-eyebrow {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 2.5px;
-      text-transform: uppercase;
-      color: #12967A;
-      margin-bottom: 14px;
-    }
-
-    .section-title {
-      font-size: 40px;
-      font-weight: 900;
-      color: #0D1F18;
-      margin-bottom: 16px;
-      max-width: 540px;
-      line-height: 1.12;
-    }
-
-    .section-sub {
-      font-size: 17px;
-      color: #4A5E56;
-      line-height: 1.7;
-      max-width: 560px;
-      margin-bottom: 56px;
-    }
-
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 22px;
-    }
-
-    .feature-card {
-      background: #fff;
-      border-radius: 20px;
-      padding: 28px;
-      border: 1px solid rgba(10,92,74,0.08);
-      transition: box-shadow 0.2s;
-    }
-
-    .feature-card:hover { box-shadow: 0 8px 32px rgba(10,92,74,0.10); }
-
-    .feature-icon {
-      width: 48px;
-      height: 48px;
-      background: rgba(10,92,74,0.08);
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 16px;
-    }
-
-    .feature-card h3 { font-size: 17px; font-weight: 700; color: #0D1F18; margin-bottom: 8px; }
-    .feature-card p { font-size: 14px; color: #4A5E56; line-height: 1.65; }
-
-    /* How it works */
-    .how {
-      padding: 100px 56px;
-      border-top: 1px solid rgba(10,92,74,0.07);
-    }
-
-    .steps {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 28px;
-      margin-top: 52px;
-      position: relative;
-    }
-
-    .steps::before {
-      content: "";
-      position: absolute;
-      top: 26px;
-      left: calc(12.5% + 14px);
-      right: calc(12.5% + 14px);
-      height: 2px;
-      background: linear-gradient(90deg, #0A5C4A, #12967A);
-      opacity: 0.2;
-    }
-
-    .step { text-align: center; }
-
-    .step-num {
-      width: 52px;
-      height: 52px;
-      background: #0A5C4A;
-      color: #fff;
-      font-size: 20px;
-      font-weight: 800;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 18px;
-      box-shadow: 0 4px 16px rgba(10,92,74,0.25);
-    }
-
-    .step h3 { font-size: 16px; font-weight: 700; color: #0D1F18; margin-bottom: 8px; }
-    .step p { font-size: 14px; color: #4A5E56; line-height: 1.65; }
-
-    /* Contact */
-    .contact-section {
-      padding: 100px 56px;
-      background: rgba(255,255,255,0.78);
-      backdrop-filter: blur(12px);
-      border-top: 1px solid rgba(10,92,74,0.07);
-      display: flex;
-      gap: 80px;
-      align-items: flex-start;
-    }
-
-    .contact-left { flex: 1; max-width: 420px; }
-    .contact-right { flex: 1; }
-
-    .contact-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 16px;
-      margin-bottom: 28px;
-    }
-
-    .contact-icon {
-      width: 44px;
-      height: 44px;
-      background: rgba(10,92,74,0.09);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .contact-item h4 { font-size: 15px; font-weight: 700; color: #0D1F18; margin-bottom: 3px; }
-    .contact-item p, .contact-item a {
-      font-size: 14px;
-      color: #4A5E56;
-      text-decoration: none;
-    }
-
-    .contact-item a:hover { color: #0A5C4A; }
-
-    /* CTA */
-    .cta-section {
-      background: #0A5C4A;
-      padding: 90px 56px;
-      text-align: center;
-      position: relative;
-      z-index: 1;
-      overflow: hidden;
-    }
-
-    .cta-section::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse at 30% 50%, rgba(18,150,122,0.3) 0%, transparent 60%),
-                  radial-gradient(ellipse at 70% 50%, rgba(10,92,74,0.4) 0%, transparent 60%);
-      pointer-events: none;
-    }
-
-    .cta-section h2 { font-size: 44px; font-weight: 900; color: #fff; margin-bottom: 14px; position: relative; }
-    .cta-section p { font-size: 18px; color: rgba(255,255,255,0.72); margin-bottom: 36px; position: relative; }
-    .cta-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; position: relative; }
-
-    .btn-store.light {
-      background: rgba(255,255,255,0.12);
-      border: 1.5px solid rgba(255,255,255,0.22);
-    }
-
-    .btn-store.light:hover { background: rgba(255,255,255,0.2); }
-
-    footer {
-      position: relative;
-      z-index: 1;
-      background: #0D1F18;
-      color: rgba(255,255,255,0.45);
-      padding: 28px 56px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 14px;
-    }
-
-    footer a { color: rgba(255,255,255,0.45); text-decoration: underline; }
-    footer a:hover { color: #fff; }
-
-    @media (max-width: 960px) {
-      nav, .hero, .about, .how, .contact-section, .cta-section, footer { padding-left: 24px; padding-right: 24px; }
-      .nav-links { display: none; }
-      .hero { flex-direction: column; text-align: center; min-height: auto; padding-top: 56px; }
-      .hero-headline { font-size: 38px; }
-      .hero-sub { margin: 0 auto 32px; }
-      .hero-ctas { justify-content: center; }
-      .float-eta { left: 0; }
-      .float-deliveries { right: 0; }
-      .features-grid { grid-template-columns: 1fr; }
-      .steps { grid-template-columns: repeat(2, 1fr); }
-      .steps::before { display: none; }
-      .contact-section { flex-direction: column; gap: 40px; }
-      .cta-section h2 { font-size: 30px; }
-      footer { flex-direction: column; gap: 12px; text-align: center; }
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Wasel — Same-Day Delivery in Riyadh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green: #0A5C4A;
+    --teal: #12967A;
+    --teal-light: #e0f4ef;
+    --teal-mid: #b3e6d9;
+    --sand: #F4F6F5;
+    --charcoal: #1A1A1A;
+    --white: #ffffff;
+    --gray: #6B7280;
+    --gray-light: #F9FAFB;
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 24px;
+    --radius-pill: 999px;
+    --font: 'Plus Jakarta Sans', sans-serif;
+    --font-ar: 'Tajawal', sans-serif;
+    --nav-h: 68px;
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--font);
+    color: var(--charcoal);
+    background: var(--white);
+    line-height: 1.65;
+    font-size: 16px;
+  }
+  body.ar {
+    font-family: var(--font-ar);
+    direction: rtl;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: var(--nav-h);
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(10,92,74,0.08);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 5%;
+    z-index: 100;
+    transition: box-shadow 0.2s;
+  }
+  nav.scrolled { box-shadow: 0 2px 20px rgba(10,92,74,0.08); }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none;
+    font-size: 1.35rem; font-weight: 800;
+    color: var(--green);
+    letter-spacing: -0.5px;
+  }
+  .logo-mark {
+    width: 36px; height: 36px;
+    background: var(--green);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 1rem; font-weight: 800;
+  }
+  .nav-links {
+    display: flex; align-items: center; gap: 2px;
+    list-style: none;
+  }
+  .nav-links a {
+    text-decoration: none;
+    color: var(--charcoal);
+    font-size: 0.9rem; font-weight: 500;
+    padding: 8px 14px;
+    border-radius: var(--radius-pill);
+    transition: background 0.15s, color 0.15s;
+    cursor: pointer;
+  }
+  .nav-links a:hover, .nav-links a.active {
+    background: var(--teal-light);
+    color: var(--green);
+  }
+  .nav-right { display: flex; align-items: center; gap: 10px; }
+  .lang-btn {
+    background: none; border: 1.5px solid var(--teal-mid);
+    color: var(--green); font-size: 0.82rem; font-weight: 600;
+    padding: 6px 14px; border-radius: var(--radius-pill);
+    cursor: pointer; font-family: inherit;
+    transition: background 0.15s, color 0.15s;
+  }
+  .lang-btn:hover { background: var(--teal-light); }
+  .cta-nav {
+    background: var(--green); color: white;
+    border: none; padding: 9px 20px;
+    border-radius: var(--radius-pill);
+    font-size: 0.88rem; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+    transition: background 0.15s, transform 0.1s;
+    text-decoration: none;
+  }
+  .cta-nav:hover { background: #0d7260; }
+  .cta-nav:active { transform: scale(0.97); }
+
+  /* ── PAGES ── */
+  .page { display: none; padding-top: var(--nav-h); }
+  .page.active { display: block; }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(150deg, #f0faf6 0%, #ffffff 60%);
+    padding: 80px 5% 60px;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 48px; align-items: center;
+    min-height: calc(100vh - var(--nav-h));
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--teal-light);
+    color: var(--green);
+    font-size: 0.78rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    padding: 6px 14px; border-radius: var(--radius-pill);
+    margin-bottom: 20px;
+  }
+  .badge-dot {
+    width: 7px; height: 7px;
+    background: var(--teal); border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+  .hero h1 {
+    font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+    font-weight: 800; line-height: 1.15;
+    letter-spacing: -1px; color: var(--charcoal);
+    margin-bottom: 20px;
+  }
+  .hero h1 span { color: var(--teal); }
+  .hero p {
+    font-size: 1.05rem; color: var(--gray);
+    max-width: 440px; margin-bottom: 36px;
+    line-height: 1.75;
+  }
+  .hero-btns { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--green); color: white;
+    padding: 14px 26px; border-radius: var(--radius-pill);
+    font-weight: 700; font-size: 0.95rem;
+    text-decoration: none; border: none;
+    cursor: pointer; font-family: inherit;
+    transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+    box-shadow: 0 4px 16px rgba(10,92,74,0.25);
+  }
+  .btn-primary:hover { background: #0d7260; box-shadow: 0 6px 20px rgba(10,92,74,0.32); }
+  .btn-primary:active { transform: scale(0.97); }
+  .btn-secondary {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: white; color: var(--green);
+    padding: 14px 24px; border-radius: var(--radius-pill);
+    font-weight: 700; font-size: 0.95rem;
+    border: 2px solid var(--teal-mid); text-decoration: none;
+    cursor: pointer; font-family: inherit;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .btn-secondary:hover { background: var(--teal-light); border-color: var(--teal); }
+
+  /* store badges */
+  .store-badges { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+  .store-badge {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--charcoal); color: white;
+    padding: 10px 18px; border-radius: var(--radius-md);
+    text-decoration: none; font-size: 0.82rem;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .store-badge:hover { background: #333; transform: translateY(-2px); }
+  .store-icon { font-size: 1.3rem; }
+  .store-label { display: flex; flex-direction: column; }
+  .store-label small { font-size: 0.68rem; opacity: 0.7; line-height: 1; }
+  .store-label span { font-size: 0.88rem; font-weight: 700; line-height: 1.3; }
+
+  /* hero visual */
+  .hero-visual {
+    display: flex; justify-content: center; align-items: center;
+    position: relative;
+  }
+  .phone-frame {
+    width: 260px; height: 520px;
+    background: var(--charcoal);
+    border-radius: 38px;
+    padding: 14px;
+    box-shadow: 0 30px 80px rgba(10,92,74,0.18), 0 8px 24px rgba(0,0,0,0.12);
+    position: relative;
+    animation: float 4s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%,100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+  .phone-screen {
+    width: 100%; height: 100%;
+    background: var(--sand);
+    border-radius: 28px;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .phone-bar {
+    background: var(--green); color: white;
+    padding: 14px 16px 10px;
+    font-size: 0.72rem; font-weight: 700;
+  }
+  .phone-bar .small { font-size: 0.6rem; opacity: 0.75; font-weight: 400; margin-bottom: 4px; }
+  .phone-map {
+    flex: 1; background: #d4ede6;
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .map-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(10,92,74,0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(10,92,74,0.08) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+  .map-road-h {
+    position: absolute; left: 0; right: 0;
+    height: 10px; background: rgba(255,255,255,0.6);
+    border-radius: 2px;
+  }
+  .map-road-v {
+    position: absolute; top: 0; bottom: 0;
+    width: 10px; background: rgba(255,255,255,0.6);
+    border-radius: 2px;
+  }
+  .rider-pin {
+    position: absolute;
+    width: 32px; height: 32px;
+    background: var(--teal); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 14px;
+    box-shadow: 0 0 0 6px rgba(18,150,122,0.2);
+    animation: riderMove 5s ease-in-out infinite;
+  }
+  @keyframes riderMove {
+    0% { top: 40%; left: 30%; }
+    33% { top: 55%; left: 50%; }
+    66% { top: 35%; left: 60%; }
+    100% { top: 40%; left: 30%; }
+  }
+  .dest-pin {
+    position: absolute; top: 28%; left: 58%;
+    width: 28px; height: 28px;
+    background: var(--green); border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    box-shadow: 0 2px 8px rgba(10,92,74,0.35);
+  }
+  .phone-status {
+    background: white; padding: 10px 14px;
+    font-size: 0.68rem; color: var(--gray);
+    border-top: 1px solid rgba(0,0,0,0.06);
+  }
+  .status-row { display: flex; justify-content: space-between; align-items: center; }
+  .status-chip {
+    background: #dcfce7; color: #15803d;
+    font-size: 0.62rem; font-weight: 700;
+    padding: 3px 8px; border-radius: 999px;
+  }
+  /* floating cards */
+  .float-card {
+    position: absolute;
+    background: white; border-radius: var(--radius-md);
+    padding: 10px 14px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    font-size: 0.75rem;
+    min-width: 130px;
+  }
+  .float-card.left { left: -80px; top: 30%; }
+  .float-card.right { right: -80px; top: 60%; }
+  .float-card .fc-label { color: var(--gray); font-size: 0.65rem; margin-bottom: 3px; }
+  .float-card .fc-val { font-weight: 700; color: var(--green); font-size: 0.95rem; }
+
+  /* ── TRUST STRIP ── */
+  .trust-strip {
+    background: var(--sand);
+    padding: 24px 5%;
+    display: flex; align-items: center; justify-content: center;
+    gap: 48px; flex-wrap: wrap;
+  }
+  .trust-item {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 0.85rem; color: var(--gray); font-weight: 500;
+  }
+  .trust-icon {
+    width: 36px; height: 36px;
+    background: white; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+
+  /* ── SECTION COMMON ── */
+  section { padding: 80px 5%; }
+  .section-tag {
+    display: inline-block;
+    color: var(--teal); font-size: 0.78rem;
+    font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.1em; margin-bottom: 10px;
+  }
+  h2.section-title {
+    font-size: clamp(1.7rem, 3vw, 2.4rem);
+    font-weight: 800; letter-spacing: -0.5px;
+    line-height: 1.2; color: var(--charcoal);
+    margin-bottom: 14px;
+  }
+  .section-sub {
+    font-size: 1rem; color: var(--gray);
+    max-width: 520px; line-height: 1.75;
+    margin-bottom: 48px;
+  }
+  .centered { text-align: center; }
+  .section-sub.centered { margin: 0 auto 48px; }
+
+  /* ── FEATURES ── */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+  }
+  .feature-card {
+    background: var(--sand);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .feature-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 3px; background: var(--teal);
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.25s;
+  }
+  .feature-card:hover::before { transform: scaleX(1); }
+  .feature-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(10,92,74,0.1); }
+  .feature-icon {
+    width: 48px; height: 48px;
+    background: var(--teal-light);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; margin-bottom: 16px;
+  }
+  .feature-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; color: var(--charcoal); }
+  .feature-card p { font-size: 0.88rem; color: var(--gray); line-height: 1.7; }
+
+  /* ── HOW IT WORKS ── */
+  .steps-wrap {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 60px; align-items: center;
+  }
+  .steps-list { display: flex; flex-direction: column; gap: 0; }
+  .step {
+    display: flex; gap: 20px; padding: 24px 0;
+    border-bottom: 1px solid rgba(10,92,74,0.08);
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .step:last-child { border-bottom: none; }
+  .step.dim { opacity: 0.45; }
+  .step-num {
+    width: 40px; height: 40px; min-width: 40px;
+    background: var(--teal-light); color: var(--green);
+    border-radius: 50%; font-weight: 800; font-size: 0.95rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s, color 0.2s;
+  }
+  .step.active .step-num { background: var(--green); color: white; }
+  .step-body h3 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+  .step-body p { font-size: 0.88rem; color: var(--gray); line-height: 1.65; }
+  .step-visual {
+    background: var(--sand); border-radius: var(--radius-lg);
+    min-height: 380px; display: flex; align-items: center; justify-content: center;
+    font-size: 4rem; position: relative; overflow: hidden;
+  }
+  .step-visual-content {
+    display: none; flex-direction: column; align-items: center;
+    gap: 16px; padding: 32px; text-align: center;
+  }
+  .step-visual-content.active { display: flex; }
+  .step-visual-content .big-icon { font-size: 3.5rem; }
+  .step-visual-content h4 { font-size: 1.1rem; font-weight: 700; color: var(--green); }
+  .step-visual-content p { font-size: 0.88rem; color: var(--gray); }
+
+  /* ── ABOUT ── */
+  .about-hero {
+    background: linear-gradient(135deg, var(--green) 0%, #12967A 100%);
+    color: white; padding: 80px 5%;
+    text-align: center;
+  }
+  .about-hero h1 { font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; letter-spacing: -0.5px; margin-bottom: 16px; }
+  .about-hero p { font-size: 1.05rem; opacity: 0.85; max-width: 580px; margin: 0 auto; }
+  .about-content { padding: 72px 5%; }
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; margin-bottom: 72px; }
+  .about-grid.reverse { direction: rtl; }
+  .about-grid.reverse > * { direction: ltr; }
+  .about-text .label { color: var(--teal); font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
+  .about-text h2 { font-size: 1.8rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 16px; }
+  .about-text p { color: var(--gray); line-height: 1.8; margin-bottom: 14px; font-size: 0.97rem; }
+  .about-visual-block {
+    background: var(--sand); border-radius: var(--radius-lg);
+    padding: 40px; display: flex; align-items: center;
+    justify-content: center; min-height: 320px; flex-direction: column;
+    gap: 20px;
+  }
+  .stat-row { display: flex; gap: 24px; flex-wrap: wrap; }
+  .stat-box {
+    flex: 1; min-width: 110px;
+    background: white; border-radius: var(--radius-md);
+    padding: 20px; text-align: center;
+    box-shadow: 0 2px 12px rgba(10,92,74,0.06);
+  }
+  .stat-box .num { font-size: 2rem; font-weight: 800; color: var(--green); }
+  .stat-box .lbl { font-size: 0.78rem; color: var(--gray); margin-top: 4px; }
+  .values-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px; margin-top: 48px;
+  }
+  .value-card {
+    border: 1.5px solid var(--teal-mid);
+    border-radius: var(--radius-md); padding: 24px;
+    text-align: center;
+  }
+  .value-card .vi { font-size: 1.8rem; margin-bottom: 10px; }
+  .value-card h4 { font-size: 0.95rem; font-weight: 700; color: var(--green); margin-bottom: 6px; }
+  .value-card p { font-size: 0.82rem; color: var(--gray); }
+
+  /* ── CONTACT ── */
+  .contact-hero {
+    background: linear-gradient(135deg, var(--green) 0%, #12967A 100%);
+    color: white; padding: 80px 5%; text-align: center;
+  }
+  .contact-hero h1 { font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; letter-spacing: -0.5px; margin-bottom: 16px; }
+  .contact-hero p { font-size: 1.05rem; opacity: 0.85; max-width: 500px; margin: 0 auto; }
+  .contact-body { padding: 72px 5%; display: grid; grid-template-columns: 1fr 1.4fr; gap: 60px; max-width: 1100px; margin: 0 auto; }
+  .contact-info h2 { font-size: 1.4rem; font-weight: 800; margin-bottom: 8px; }
+  .contact-info .sub { color: var(--gray); font-size: 0.9rem; margin-bottom: 32px; line-height: 1.7; }
+  .contact-items { display: flex; flex-direction: column; gap: 20px; }
+  .ci {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 18px; background: var(--sand); border-radius: var(--radius-md);
+  }
+  .ci-icon {
+    width: 40px; height: 40px; min-width: 40px;
+    background: var(--teal-light); border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; color: var(--green);
+  }
+  .ci-label { font-size: 0.75rem; color: var(--gray); margin-bottom: 2px; }
+  .ci-val { font-size: 0.9rem; font-weight: 600; color: var(--charcoal); }
+  .contact-form { background: var(--sand); border-radius: var(--radius-lg); padding: 36px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px; }
+  .form-group label { font-size: 0.82rem; font-weight: 600; color: var(--charcoal); }
+  .form-group input, .form-group textarea, .form-group select {
+    background: white; border: 1.5px solid rgba(10,92,74,0.15);
+    border-radius: var(--radius-sm); padding: 11px 14px;
+    font-family: inherit; font-size: 0.9rem; color: var(--charcoal);
+    outline: none; transition: border-color 0.15s;
+    width: 100%;
+  }
+  .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+    border-color: var(--teal);
+    box-shadow: 0 0 0 3px rgba(18,150,122,0.12);
+  }
+  .form-group textarea { resize: vertical; min-height: 110px; }
+  .form-success {
+    display: none; text-align: center; padding: 24px;
+    color: var(--green); font-weight: 600;
+  }
+
+  /* ── CTA BAND ── */
+  .cta-band {
+    background: linear-gradient(135deg, var(--green) 0%, #12967A 100%);
+    padding: 72px 5%; text-align: center; color: white;
+  }
+  .cta-band h2 { font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 800; letter-spacing: -0.5px; margin-bottom: 14px; }
+  .cta-band p { opacity: 0.85; max-width: 480px; margin: 0 auto 36px; font-size: 1rem; line-height: 1.75; }
+  .cta-band .store-badges { justify-content: center; }
+  .cta-band .store-badge { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); color: white; }
+  .cta-band .store-badge:hover { background: rgba(255,255,255,0.25); }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--charcoal); color: white;
+    padding: 48px 5% 28px;
+  }
+  .footer-top { display: flex; gap: 40px; flex-wrap: wrap; justify-content: space-between; margin-bottom: 36px; }
+  .footer-brand .logo { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 1.2rem; font-weight: 800; color: white; }
+  .footer-brand p { font-size: 0.84rem; opacity: 0.6; line-height: 1.7; max-width: 240px; }
+  .footer-links h4 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.5; margin-bottom: 12px; font-weight: 600; }
+  .footer-links ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .footer-links a { color: rgba(255,255,255,0.75); text-decoration: none; font-size: 0.88rem; cursor: pointer; transition: color 0.15s; }
+  .footer-links a:hover { color: white; }
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding-top: 20px;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 10px;
+    font-size: 0.78rem; opacity: 0.4;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; gap: 40px; }
+    .hero-visual { order: -1; }
+    .steps-wrap { grid-template-columns: 1fr; }
+    .about-grid, .contact-body { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    .float-card { display: none; }
+    nav { padding: 0 4%; }
+    .nav-links { display: none; }
+  }
+  @media (max-width: 600px) {
+    .trust-strip { gap: 24px; }
+    .hero { padding: 48px 5% 40px; }
+  }
+
+  /* ── AR OVERRIDES ── */
+  body.ar .hero h1 { letter-spacing: 0; }
+  body.ar .section-tag { letter-spacing: 0.03em; }
+  body.ar .feature-card::before { transform-origin: right; }
+</style>
 </head>
 <body>
 
-<!-- Topographic contour background -->
-<div class="topo-bg">
-  <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-    <rect width="1440" height="900" fill="#F5FAF7"/>
-    <!-- Contour lines - organic flowing curves -->
-    <g fill="none" stroke="#0A5C4A" stroke-width="1.2" opacity="0.07">
-      <path d="M-100,600 C100,580 200,560 350,540 C500,520 600,500 750,490 C900,480 1050,470 1200,460 C1350,450 1450,445 1540,440"/>
-      <path d="M-100,560 C80,545 180,530 320,515 C460,500 570,488 720,478 C870,468 1020,455 1170,445 C1320,435 1420,430 1540,425"/>
-      <path d="M-100,520 C60,508 160,498 300,486 C440,474 555,464 700,454 C845,444 990,434 1140,424 C1290,414 1390,408 1540,402"/>
-      <path d="M-100,480 C50,471 145,463 280,452 C415,441 530,433 678,424 C826,415 968,406 1118,396 C1268,386 1368,380 1540,374"/>
-      <path d="M-100,440 C40,432 130,425 262,416 C394,407 508,400 655,391 C802,382 946,372 1096,362 C1246,352 1346,347 1540,342"/>
-      <path d="M-100,400 C25,393 115,387 244,379 C373,371 487,364 634,355 C781,346 924,337 1074,327 C1224,317 1324,313 1540,308"/>
-      <path d="M-100,360 C15,354 100,348 226,341 C352,334 466,328 612,320 C758,312 902,303 1052,293 C1202,283 1302,279 1540,274"/>
-      <path d="M-100,640 C110,624 220,610 380,594 C540,578 640,566 800,556 C960,546 1110,536 1260,526 C1410,516 1510,511 1540,509"/>
-      <path d="M-100,680 C120,668 240,656 410,642 C580,628 680,618 840,608 C1000,598 1150,588 1300,578 C1450,568 1550,562 1540,561"/>
-      <path d="M-100,320 C10,314 90,309 212,303 C334,297 448,291 594,283 C740,275 884,267 1034,257 C1184,247 1284,243 1540,238"/>
-      <path d="M-100,720 C130,710 260,700 440,688 C620,676 720,666 880,657 C1040,648 1190,638 1340,629 C1490,620 1590,615 1540,613"/>
-      <path d="M-100,760 C140,752 280,744 470,734 C660,724 760,714 920,706 C1080,698 1230,688 1380,680 C1530,672 1630,667 1540,665"/>
-    </g>
-    <!-- Wider spaced bolder contours for depth -->
-    <g fill="none" stroke="#0A5C4A" stroke-width="2" opacity="0.04">
-      <path d="M-100,500 C70,487 170,476 310,466 C450,456 560,447 710,438 C860,429 1010,420 1160,411 C1310,402 1410,397 1540,392"/>
-      <path d="M-100,580 C90,567 200,556 350,545 C500,534 610,525 760,516 C910,507 1060,498 1210,489 C1360,480 1460,475 1540,471"/>
-      <path d="M-100,420 C55,410 150,402 286,394 C422,386 533,379 680,370 C827,361 972,352 1122,343 C1272,334 1372,329 1540,324"/>
-    </g>
-    <!-- Subtle radial glow center-right -->
-    <radialGradient id="glow" cx="75%" cy="45%" r="45%">
-      <stop offset="0%" stop-color="#12967A" stop-opacity="0.06"/>
-      <stop offset="100%" stop-color="#12967A" stop-opacity="0"/>
-    </radialGradient>
-    <rect width="1440" height="900" fill="url(#glow)"/>
-  </svg>
-</div>
-
-<nav>
-  <a href="#" class="nav-logo">
-    <div class="nav-logo-icon">و</div>
-    <span class="nav-logo-text">Wasel</span>
+<!-- NAV -->
+<nav id="main-nav">
+  <a class="nav-logo" href="#" onclick="showPage('home')">
+    <div class="logo-mark">و</div>
+    <span id="logo-text">Wasel</span>
   </a>
-  <ul class="nav-links">
-    <li><a href="#" class="active">Home</a></li>
-    <li><a href="#about">About</a></li>
-    <li><a href="#how">How It Works</a></li>
-    <li><a href="#contact">Contact</a></li>
+  <ul class="nav-links" id="nav-links">
+    <li><a onclick="showPage('home')" data-page="home" data-en="Home" data-ar="الرئيسية">Home</a></li>
+    <li><a onclick="showPage('about')" data-page="about" data-en="About" data-ar="عن واصل">About</a></li>
+    <li><a onclick="showPage('how')" data-page="how" data-en="How It Works" data-ar="كيف يعمل">How It Works</a></li>
+    <li><a onclick="showPage('contact')" data-page="contact" data-en="Contact" data-ar="تواصل معنا">Contact</a></li>
   </ul>
-  <div class="nav-actions">
-    <button class="btn-lang">عربي</button>
-    <a href="#download" class="btn-download-nav">Download App</a>
+  <div class="nav-right">
+    <button class="lang-btn" id="lang-toggle" onclick="toggleLang()">عربي</button>
+    <a class="cta-nav" href="#" data-en="Download App" data-ar="حمّل التطبيق">Download App</a>
   </div>
 </nav>
 
-<!-- Home -->
-<section class="hero" id="home">
-  <div class="hero-left">
-    <div class="badge">
-      <span class="badge-dot"></span>
-      Now Live in Riyadh
-    </div>
-    <h1 class="hero-headline">
-      Delivery that moves<br>
-      <span>as fast as you do.</span>
-    </h1>
-    <p class="hero-sub">
-      Wasel connects you with nearby independent riders who pick up and deliver your packages across Riyadh — fast, trackable, and always on time.
-    </p>
-    <div class="hero-ctas" id="download">
-      <a href="#" class="btn-store">
+<!-- ═══════════════ HOME ═══════════════ -->
+<div class="page active" id="page-home">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <div class="badge-dot"></div>
+        <span data-en="Now Live in Riyadh" data-ar="متاح الآن في الرياض">Now Live in Riyadh</span>
+      </div>
+      <h1 data-en="Delivery that moves<br><span>as fast as you do.</span>" data-ar="توصيل <span>بسرعتك</span><br>في أي مكان بالرياض.">Delivery that moves<br><span>as fast as you do.</span></h1>
+      <p data-en="Wasel connects you with nearby independent riders who pick up and deliver your packages across Riyadh — fast, trackable, and always on time." data-ar="واصل يربطك بسائقين مستقلين قريبين منك لاستلام وتوصيل طلباتك في الرياض — بسرعة وموثوقية تامة.">Wasel connects you with nearby independent riders who pick up and deliver your packages across Riyadh — fast, trackable, and always on time.</p>
+      <div class="store-badges">
+        <a class="store-badge" href="#">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
           <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98l-.09.06c-.22.14-2.2 1.28-2.18 3.81.03 3.02 2.65 4.03 2.68 4.04l-.05.27zM13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
         </svg>
-        <div class="store-label">
-          <span class="store-sub">Download on the</span>
-          <span class="store-name">App Store</span>
-        </div>
-      </a>
-      <a href="#" class="btn-store">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-          <path d="M3.18 1.09C2.77 1.52 2.5 2.18 2.5 3.04v17.92c0 .86.27 1.52.69 1.94l.1.1L13.43 12.5v-.28L3.28.99l-.1.1z" fill="#EA4335"/>
-          <path d="M17.12 16.19l-3.69-3.69v-.28l3.69-3.69.08.05 4.37 2.48c1.25.71 1.25 1.87 0 2.58l-4.37 2.48-.08.07z" fill="#FBBC04"/>
-          <path d="M17.2 16.12L13.43 12.5 3.18 22.9c.41.44 1.09.49 1.86.05l12.16-6.83" fill="#34A853"/>
-          <path d="M17.2 7.88L5.04 1.05C4.27.61 3.59.66 3.18 1.1L13.43 11.5l3.77-3.62z" fill="#4285F4"/>
-        </svg>
-        <div class="store-label">
-          <span class="store-sub">Get it on</span>
-          <span class="store-name">Google Play</span>
-        </div>
-      </a>
+          <span class="store-label">
+            <small data-en="Download on the" data-ar="حمّل من">Download on the</small>
+            <span>App Store</span>
+          </span>
+        </a>
+        <a class="store-badge" href="#">
+          <span class="store-icon">▶</span>
+          <span class="store-label">
+            <small data-en="Get it on" data-ar="احصل عليه من">Get it on</small>
+            <span>Google Play</span>
+          </span>
+        </a>
+      </div>
     </div>
-  </div>
-
-  <div class="hero-right">
-    <div class="float-card float-eta">
-      <div class="card-label">Rider ETA</div>
-      <div class="card-value">4 min</div>
-    </div>
-
-    <div class="phone-wrap">
+    <div class="hero-visual">
+      <div class="float-card left">
+        <div class="fc-label" data-en="Rider ETA" data-ar="وقت الوصول">Rider ETA</div>
+        <div class="fc-val">4 min</div>
+      </div>
       <div class="phone-frame">
-        <div class="phone-island"></div>
         <div class="phone-screen">
-          <div class="phone-header">
-            <div class="ph-label"><span class="ph-dot"></span> Live tracking</div>
-            <div class="ph-order">Order #2841</div>
+          <div class="phone-bar">
+            <div class="small" data-en="Live tracking" data-ar="تتبع مباشر">Live tracking</div>
+            <div data-en="📦 Order #2841" data-ar="📦 طلب #2841">📦 Order #2841</div>
           </div>
           <div class="phone-map">
-            <svg viewBox="0 0 224 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-              <rect width="224" height="300" fill="#D8EDE5"/>
-              <!-- City blocks -->
-              <rect x="0" y="0" width="55" height="70" fill="#C8E4D8" rx="1"/>
-              <rect x="65" y="0" width="65" height="70" fill="#CCE7DB" rx="1"/>
-              <rect x="140" y="0" width="84" height="70" fill="#C8E4D8" rx="1"/>
-              <rect x="0" y="90" width="55" height="85" fill="#CCE7DB" rx="1"/>
-              <rect x="65" y="90" width="30" height="40" fill="#C8E4D8" rx="1"/>
-              <rect x="65" y="136" width="30" height="39" fill="#CCE7DB" rx="1"/>
-              <rect x="105" y="90" width="25" height="85" fill="#C8E4D8" rx="1"/>
-              <rect x="140" y="90" width="84" height="85" fill="#CCE7DB" rx="1"/>
-              <rect x="0" y="198" width="55" height="102" fill="#C8E4D8" rx="1"/>
-              <rect x="65" y="198" width="65" height="47" fill="#CCE7DB" rx="1"/>
-              <rect x="65" y="252" width="65" height="48" fill="#C8E4D8" rx="1"/>
-              <rect x="140" y="198" width="84" height="102" fill="#CCE7DB" rx="1"/>
-              <!-- Roads horizontal -->
-              <rect x="0" y="78" width="224" height="10" fill="#EAF3EF"/>
-              <rect x="0" y="186" width="224" height="10" fill="#EAF3EF"/>
-              <!-- Roads vertical -->
-              <rect x="57" y="0" width="8" height="300" fill="#EAF3EF"/>
-              <rect x="132" y="0" width="8" height="300" fill="#EAF3EF"/>
-              <!-- Dashes -->
-              <line x1="0" y1="83" x2="224" y2="83" stroke="rgba(255,255,255,0.6)" stroke-width="1" stroke-dasharray="10 8"/>
-              <line x1="0" y1="191" x2="224" y2="191" stroke="rgba(255,255,255,0.6)" stroke-width="1" stroke-dasharray="10 8"/>
-              <line x1="61" y1="0" x2="61" y2="300" stroke="rgba(255,255,255,0.6)" stroke-width="1" stroke-dasharray="10 8"/>
-              <line x1="136" y1="0" x2="136" y2="300" stroke="rgba(255,255,255,0.6)" stroke-width="1" stroke-dasharray="10 8"/>
-              <!-- Small streets -->
-              <line x1="0" y1="36" x2="57" y2="36" stroke="#C4DDD6" stroke-width="4"/>
-              <line x1="65" y1="36" x2="132" y2="36" stroke="#C4DDD6" stroke-width="4"/>
-              <line x1="140" y1="36" x2="224" y2="36" stroke="#C4DDD6" stroke-width="4"/>
-              <line x1="0" y1="134" x2="57" y2="134" stroke="#C4DDD6" stroke-width="4"/>
-              <line x1="65" y1="134" x2="132" y2="134" stroke="#C4DDD6" stroke-width="4"/>
-              <line x1="140" y1="134" x2="224" y2="134" stroke="#C4DDD6" stroke-width="4"/>
-              <line x1="0" y1="240" x2="57" y2="240" stroke="#C4DDD6" stroke-width="4"/>
-              <line x1="65" y1="240" x2="132" y2="240" stroke="#C4DDD6" stroke-width="4"/>
-              <line x1="140" y1="240" x2="224" y2="240" stroke="#C4DDD6" stroke-width="4"/>
-              <line x1="27" y1="0" x2="27" y2="78" stroke="#C4DDD6" stroke-width="4"/>
-              <line x1="27" y1="88" x2="27" y2="186" stroke="#C4DDD6" stroke-width="4"/>
-              <line x1="27" y1="196" x2="27" y2="300" stroke="#C4DDD6" stroke-width="4"/>
-              <line x1="95" y1="0" x2="95" y2="78" stroke="#C4DDD6" stroke-width="4"/>
-              <line x1="95" y1="88" x2="95" y2="186" stroke="#C4DDD6" stroke-width="4"/>
-              <line x1="95" y1="196" x2="95" y2="300" stroke="#C4DDD6" stroke-width="4"/>
-              <line x1="168" y1="0" x2="168" y2="78" stroke="#C4DDD6" stroke-width="4"/>
-              <line x1="168" y1="88" x2="168" y2="186" stroke="#C4DDD6" stroke-width="4"/>
-              <line x1="168" y1="196" x2="168" y2="300" stroke="#C4DDD6" stroke-width="4"/>
-              <!-- Route -->
-              <polyline points="112,220 112,191 112,83 136,83 136,50" stroke="#0A5C4A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 5" opacity="0.9"/>
-              <!-- Rider pulse -->
-              <circle cx="112" cy="220" r="18" fill="#0A5C4A" opacity="0.12"/>
-              <circle cx="112" cy="220" r="11" fill="#0A5C4A" opacity="0.22"/>
-              <circle cx="112" cy="220" r="7" fill="#0A5C4A"/>
-              <circle cx="112" cy="220" r="3" fill="#fff"/>
-              <!-- Destination pin -->
-              <ellipse cx="136" cy="53" rx="5" ry="2.5" fill="rgba(0,0,0,0.12)"/>
-              <path d="M136 30 C130 30 126 34.5 126 39.5 C126 47 136 53 136 53 C136 53 146 47 146 39.5 C146 34.5 142 30 136 30Z" fill="#0A5C4A"/>
-              <circle cx="136" cy="39.5" r="4.5" fill="#fff"/>
-            </svg>
+            <div class="map-grid"></div>
+            <div class="map-road-h" style="top:40%"></div>
+            <div class="map-road-h" style="top:65%"></div>
+            <div class="map-road-v" style="left:35%"></div>
+            <div class="map-road-v" style="left:62%"></div>
+            <div class="dest-pin"></div>
+            <div class="rider-pin">🏍</div>
           </div>
-          <div class="phone-footer">
-            <span>On the way</span>
-            <span class="live-badge">Live</span>
+          <div class="phone-status">
+            <div class="status-row">
+              <span data-en="On the way" data-ar="في الطريق">On the way</span>
+              <span class="status-chip" data-en="Live" data-ar="مباشر">Live</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="float-card right">
+        <div class="fc-label" data-en="Today's deliveries" data-ar="توصيلات اليوم">Today's deliveries</div>
+        <div class="fc-val">1,240+</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST STRIP -->
+  <div class="trust-strip">
+    <div class="trust-item">
+      <div class="trust-icon">⚡</div>
+      <span data-en="Same-day delivery" data-ar="توصيل في نفس اليوم">Same-day delivery</span>
+    </div>
+    <div class="trust-item">
+      <div class="trust-icon">📍</div>
+      <span data-en="Real-time GPS tracking" data-ar="تتبع GPS مباشر">Real-time GPS tracking</span>
+    </div>
+    <div class="trust-item">
+      <div class="trust-icon">💳</div>
+      <span data-en="Card & cash payments" data-ar="دفع بالبطاقة أو نقداً">Card & cash payments</span>
+    </div>
+    <div class="trust-item">
+      <div class="trust-icon">🌐</div>
+      <span data-en="Arabic & English" data-ar="العربية والإنجليزية">Arabic & English</span>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section>
+    <div class="section-tag" data-en="Why Wasel" data-ar="لماذا واصل">Why Wasel</div>
+    <h2 class="section-title" data-en="Everything you need,<br>nothing you don't." data-ar="كل ما تحتاجه،<br>بلا تعقيد.">Everything you need,<br>nothing you don't.</h2>
+    <p class="section-sub" data-en="Built for the pace of Riyadh. Whether you're sending a birthday gift across town or getting urgent documents delivered, Wasel has you covered." data-ar="مصمم لإيقاع الرياض. سواء أرسلت هدية أو وثائق عاجلة، واصل يوصلها.">Built for the pace of Riyadh. Whether you're sending a birthday gift across town or getting urgent documents delivered, Wasel has you covered.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🏍</div>
+        <h3 data-en="Instant Matching" data-ar="مطابقة فورية">Instant Matching</h3>
+        <p data-en="Our algorithm finds the nearest available rider in seconds so your package gets moving without delay." data-ar="خوارزميتنا تجد أقرب سائق متاح في ثوانٍ لبدء التوصيل فوراً.">Our algorithm finds the nearest available rider in seconds so your package gets moving without delay.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📍</div>
+        <h3 data-en="Live GPS Tracking" data-ar="تتبع GPS مباشر">Live GPS Tracking</h3>
+        <p data-en="Watch your rider move on the map in real time. No more guessing — you always know exactly where your delivery is." data-ar="تابع حركة السائق على الخريطة مباشرةً. لا مزيد من الانتظار المجهول.">Watch your rider move on the map in real time. No more guessing — you always know exactly where your delivery is.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔔</div>
+        <h3 data-en="Smart Notifications" data-ar="إشعارات ذكية">Smart Notifications</h3>
+        <p data-en="Get push notifications at every step — when your rider is assigned, on the way, and when your package is delivered." data-ar="استقبل إشعارات في كل خطوة — عند تعيين السائق وعند الاستلام والتسليم.">Get push notifications at every step — when your rider is assigned, on the way, and when your package is delivered.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💳</div>
+        <h3 data-en="Flexible Payments" data-ar="مدفوعات مرنة">Flexible Payments</h3>
+        <p data-en="Pay securely by card via Stripe or choose cash on delivery — whatever works best for you." data-ar="ادفع بأمان عبر البطاقة أو اختر الدفع نقداً عند التسليم — أيهما يناسبك.">Pay securely by card via Stripe or choose cash on delivery — whatever works best for you.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🌐</div>
+        <h3 data-en="Bilingual App" data-ar="تطبيق ثنائي اللغة">Bilingual App</h3>
+        <p data-en="Fully available in Arabic with RTL layout and English. Swap languages with one tap — anytime." data-ar="متاح بالكامل بالعربية مع دعم كامل للاتجاه من اليمين لليسار، وباللغة الإنجليزية.">Fully available in Arabic with RTL layout and English. Swap languages with one tap — anytime.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <h3 data-en="Verified Riders" data-ar="سائقون موثوقون">Verified Riders</h3>
+        <p data-en="Every Wasel rider is background-checked and onboarded through our app — so you can trust who's at your door." data-ar="كل سائق في واصل تم التحقق منه عبر تطبيقنا — لتطمئن لمن يصل إلى بابك.">Every Wasel rider is background-checked and onboarded through our app — so you can trust who's at your door.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BAND -->
+  <div class="cta-band">
+    <h2 data-en="Ready to send something?" data-ar="جاهز لإرسال طلبك؟">Ready to send something?</h2>
+    <p data-en="Download Wasel and place your first delivery in under 2 minutes." data-ar="حمّل واصل وأرسل طلبك الأول في أقل من دقيقتين.">Download Wasel and place your first delivery in under 2 minutes.</p>
+    <div class="store-badges">
+      <a class="store-badge" href="#">
+         <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+          <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98l-.09.06c-.22.14-2.2 1.28-2.18 3.81.03 3.02 2.65 4.03 2.68 4.04l-.05.27zM13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+        </svg>
+        <span class="store-label">
+          <small data-en="Download on the" data-ar="حمّل من">Download on the</small>
+          <span>App Store</span>
+        </span>
+      </a>
+      <a class="store-badge" href="#">
+        <span class="store-icon">▶</span>
+        <span class="store-label">
+          <small data-en="Get it on" data-ar="احصل عليه من">Get it on</small>
+          <span>Google Play</span>
+        </span>
+      </a>
+    </div>
+  </div>
+
+</div><!-- /home -->
+
+<!-- ═══════════════ ABOUT ═══════════════ -->
+<div class="page" id="page-about">
+  <div class="about-hero">
+    <h1 data-en="Built for Riyadh. Built for you." data-ar="بُني للرياض. بُني لك.">Built for Riyadh. Built for you.</h1>
+    <p data-en="Wasel started with a simple idea: what if getting something delivered across Riyadh was as easy as tapping your phone?" data-ar="بدأت فكرة واصل ببساطة: ماذا لو كان التوصيل عبر الرياض سهلاً كلمسة على هاتفك؟">Wasel started with a simple idea: what if getting something delivered across Riyadh was as easy as tapping your phone?</p>
+  </div>
+  <div class="about-content">
+    <div class="about-grid">
+      <div class="about-text">
+        <div class="label" data-en="Our Story" data-ar="قصتنا">Our Story</div>
+        <h2 data-en="Last-mile, reimagined." data-ar="إعادة تصور التوصيل.">Last-mile, reimagined.</h2>
+        <p data-en="Wasel was born out of frustration with the status quo — bulky courier companies with rigid schedules and zero visibility. We saw riders on every corner and people who needed things moved fast, and we connected them." data-ar="وُلد واصل من إحباط من الوضع الراهن — شركات توصيل ضخمة بجداول صارمة وصفر شفافية. رأينا سائقين في كل زاوية وناساً يحتاجون توصيلاً سريعاً، فربطنا بينهم.">Wasel was born out of frustration with the status quo — bulky courier companies with rigid schedules and zero visibility. We saw riders on every corner and people who needed things moved fast, and we connected them.</p>
+        <p data-en="Today, Wasel powers thousands of deliveries daily across Riyadh — for individuals, small businesses, and everyone in between." data-ar="اليوم، يُشغّل واصل آلاف التوصيلات يومياً في الرياض — للأفراد والشركات الصغيرة وكل من بينهم.">Today, Wasel powers thousands of deliveries daily across Riyadh — for individuals, small businesses, and everyone in between.</p>
+      </div>
+      <div class="about-visual-block">
+        <div class="stat-row">
+          <div class="stat-box">
+            <div class="num">1,200+</div>
+            <div class="lbl" data-en="Daily deliveries" data-ar="توصيلة يومياً">Daily deliveries</div>
+          </div>
+          <div class="stat-box">
+            <div class="num">400+</div>
+            <div class="lbl" data-en="Active riders" data-ar="سائق نشط">Active riders</div>
+          </div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-box">
+            <div class="num">98%</div>
+            <div class="lbl" data-en="On-time rate" data-ar="معدل الالتزام بالوقت">On-time rate</div>
+          </div>
+          <div class="stat-box">
+            <div class="num">4.8★</div>
+            <div class="lbl" data-en="App rating" data-ar="تقييم التطبيق">App rating</div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="float-card float-deliveries">
-      <div class="card-label">Today's deliveries</div>
-      <div class="card-value">1,240+</div>
+    <div class="centered">
+      <div class="section-tag" data-en="Our Values" data-ar="قيمنا">Our Values</div>
+      <h2 class="section-title" data-en="What drives us every day." data-ar="ما يحركنا كل يوم.">What drives us every day.</h2>
+    </div>
+    <div class="values-grid">
+      <div class="value-card">
+        <div class="vi">⚡</div>
+        <h4 data-en="Speed" data-ar="السرعة">Speed</h4>
+        <p data-en="We measure success in minutes, not days. Every process is designed to move fast." data-ar="نقيس النجاح بالدقائق لا الأيام. كل شيء مصمم للسرعة.">We measure success in minutes, not days. Every process is designed to move fast.</p>
+      </div>
+      <div class="value-card">
+        <div class="vi">🤝</div>
+        <h4 data-en="Trust" data-ar="الثقة">Trust</h4>
+        <p data-en="From verified riders to transparent tracking, trust is built into every layer of Wasel." data-ar="من السائقين الموثوقين إلى التتبع الشفاف، الثقة في كل طبقة من واصل.">From verified riders to transparent tracking, trust is built into every layer of Wasel.</p>
+      </div>
+      <div class="value-card">
+        <div class="vi">🌱</div>
+        <h4 data-en="Community" data-ar="المجتمع">Community</h4>
+        <p data-en="We empower independent riders with flexible earnings and support their livelihoods." data-ar="نمكّن السائقين المستقلين بأرباح مرنة وندعم معيشتهم.">We empower independent riders with flexible earnings and support their livelihoods.</p>
+      </div>
+      <div class="value-card">
+        <div class="vi">📱</div>
+        <h4 data-en="Simplicity" data-ar="البساطة">Simplicity</h4>
+        <p data-en="Complex logistics, made simple. If it takes more than 2 minutes to order, we've failed." data-ar="لوجستيات معقدة، بُسّطت. إن استغرق الطلب أكثر من دقيقتين، فقد أخفقنا.">Complex logistics, made simple. If it takes more than 2 minutes to order, we've failed.</p>
+      </div>
     </div>
   </div>
-</section>
 
-<!-- About -->
-<section class="about" id="about">
-  <div class="section-eyebrow">About Wasel</div>
-  <div class="section-title">Built for speed, designed for Riyadh.</div>
-  <p class="section-sub">Wasel is a same-day local delivery platform built for individuals and businesses who need packages moved fast across the city. Independent riders, real-time tracking, zero hassle.</p>
-  <div class="features-grid">
-    <div class="feature-card">
-      <div class="feature-icon">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#0A5C4A"/>
+  <div class="cta-band">
+    <h2 data-en="Join the Wasel community." data-ar="انضم لمجتمع واصل.">Join the Wasel community.</h2>
+    <p data-en="Whether you need deliveries or want to earn by riding, Wasel has a place for you." data-ar="سواء احتجت توصيلاً أو أردت الكسب بالتوصيل، واصل يرحب بك.">Whether you need deliveries or want to earn by riding, Wasel has a place for you.</p>
+    <div class="store-badges">
+      <a class="store-badge" href="#">
+         <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+          <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98l-.09.06c-.22.14-2.2 1.28-2.18 3.81.03 3.02 2.65 4.03 2.68 4.04l-.05.27zM13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
         </svg>
-      </div>
-      <h3>Live GPS Tracking</h3>
-      <p>Watch your rider move in real time. Know exactly when your package arrives, down to the minute.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm4.24 16L12 15.45 7.77 18l1.12-4.81-3.73-3.23 4.92-.42L12 5l1.92 4.53 4.92.42-3.73 3.23L16.23 18z" fill="#0A5C4A"/>
-        </svg>
-      </div>
-      <h3>Instant Matching</h3>
-      <p>Our algorithm finds the nearest available rider and dispatches them within seconds of your order.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z" fill="#0A5C4A"/>
-        </svg>
-      </div>
-      <h3>Secure Payments</h3>
-      <p>Pay by card via Stripe. No card numbers stored on our servers, ever.</p>
+        <span class="store-label"><small data-en="Download on the" data-ar="حمّل من">Download on the</small><span>App Store</span></span>
+      </a>
+      <a class="store-badge" href="#">
+        <span class="store-icon">▶</span>
+        <span class="store-label"><small data-en="Get it on" data-ar="احصل عليه من">Get it on</small><span>Google Play</span></span>
+      </a>
     </div>
   </div>
-</section>
+</div><!-- /about -->
 
-<!-- How It Works -->
-<section class="how" id="how">
-  <div class="section-eyebrow">How It Works</div>
-  <div class="section-title">Four steps to delivery.</div>
-  <div class="steps">
-    <div class="step">
-      <div class="step-num">1</div>
-      <h3>Enter Addresses</h3>
-      <p>Add your pickup and drop-off location in the app.</p>
-    </div>
-    <div class="step">
-      <div class="step-num">2</div>
-      <h3>Get Matched</h3>
-      <p>We instantly assign the nearest available rider.</p>
-    </div>
-    <div class="step">
-      <div class="step-num">3</div>
-      <h3>Track Live</h3>
-      <p>Follow your rider on the map with live ETA updates.</p>
-    </div>
-    <div class="step">
-      <div class="step-num">4</div>
-      <h3>Delivered</h3>
-      <p>Package arrives. You get a push notification confirmation.</p>
-    </div>
+<!-- ═══════════════ HOW IT WORKS ═══════════════ -->
+<div class="page" id="page-how">
+  <div class="about-hero">
+    <h1 data-en="From tap to doorstep." data-ar="من لمسة إلى باب بيتك.">From tap to doorstep.</h1>
+    <p data-en="Wasel makes sending packages ridiculously simple. Here's how it works in four steps." data-ar="واصل يجعل إرسال الطرود أمراً بسيطاً للغاية. إليك كيف يعمل في أربع خطوات.">Wasel makes sending packages ridiculously simple. Here's how it works in four steps.</p>
   </div>
-</section>
+  <section>
+    <div class="steps-wrap">
+      <div class="steps-list" id="steps-list">
+        <div class="step active" onclick="selectStep(0)">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h3 data-en="Enter pickup & drop-off" data-ar="أدخل العنوانين">Enter pickup & drop-off</h3>
+            <p data-en="Open the Wasel app and type in where the package should be picked up and where it's going. That's it." data-ar="افتح تطبيق واصل وأدخل مكان الاستلام والتسليم. هذا كل شيء.">Open the Wasel app and type in where the package should be picked up and where it's going. That's it.</p>
+          </div>
+        </div>
+        <div class="step dim" onclick="selectStep(1)">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h3 data-en="Get matched instantly" data-ar="مطابقة فورية مع سائق">Get matched instantly</h3>
+            <p data-en="Wasel automatically finds the nearest available rider and assigns them to your order within seconds." data-ar="واصل يجد تلقائياً أقرب سائق متاح ويكلّفه بطلبك في ثوانٍ.">Wasel automatically finds the nearest available rider and assigns them to your order within seconds.</p>
+          </div>
+        </div>
+        <div class="step dim" onclick="selectStep(2)">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h3 data-en="Track in real time" data-ar="تتبع مباشر">Track in real time</h3>
+            <p data-en="Watch your rider on the live map. Get notified at pickup and throughout the delivery journey." data-ar="تابع سائقك على الخريطة المباشرة. استقبل إشعارات عند الاستلام وطوال رحلة التوصيل.">Watch your rider on the live map. Get notified at pickup and throughout the delivery journey.</p>
+          </div>
+        </div>
+        <div class="step dim" onclick="selectStep(3)">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <h3 data-en="Delivered. Done." data-ar="وُصّل. انتهى.">Delivered. Done.</h3>
+            <p data-en="Your recipient gets the package and you get a confirmation. Pay by card or cash — your choice." data-ar="يستلم المستلم الطرد وتصلك تأكيداً. ادفع بالبطاقة أو نقداً — خيارك.">Your recipient gets the package and you get a confirmation. Pay by card or cash — your choice.</p>
+          </div>
+        </div>
+      </div>
+      <div class="step-visual">
+        <div class="step-visual-content active" data-step="0">
+          <div class="big-icon">📍</div>
+          <h4 data-en="Enter your addresses" data-ar="أدخل العناوين">Enter your addresses</h4>
+          <p data-en="Pickup location, drop-off location. Two fields and you're ready to go." data-ar="موقع الاستلام، موقع التسليم. حقلان وأنت جاهز.">Pickup location, drop-off location. Two fields and you're ready to go.</p>
+        </div>
+        <div class="step-visual-content" data-step="1">
+          <div class="big-icon">🏍</div>
+          <h4 data-en="Rider matched in seconds" data-ar="سائق في ثوانٍ">Rider matched in seconds</h4>
+          <p data-en="No waiting, no calls. Our system finds the best available rider automatically." data-ar="لا انتظار، لا مكالمات. نظامنا يجد أفضل سائق متاح تلقائياً.">No waiting, no calls. Our system finds the best available rider automatically.</p>
+        </div>
+        <div class="step-visual-content" data-step="2">
+          <div class="big-icon">🗺</div>
+          <h4 data-en="Watch it happen" data-ar="شاهد التوصيل مباشرة">Watch it happen</h4>
+          <p data-en="Live map, push notifications — you're always in the loop." data-ar="خريطة مباشرة وإشعارات فورية — أنت دائماً على اطلاع.">Live map, push notifications — you're always in the loop.</p>
+        </div>
+        <div class="step-visual-content" data-step="3">
+          <div class="big-icon">✅</div>
+          <h4 data-en="Package delivered" data-ar="تم التوصيل">Package delivered</h4>
+          <p data-en="Confirmation sent, payment processed. Fast, simple, done." data-ar="تأكيد أُرسل، مدفوعات جُهّزت. سريع، بسيط، منتهٍ.">Confirmation sent, payment processed. Fast, simple, done.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<!-- CTA -->
-<section class="cta-section">
-  <h2>Ready to send?</h2>
-  <p>Download Wasel and place your first delivery in under a minute.</p>
-  <div class="cta-buttons">
-    <a href="#" class="btn-store light">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
-        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98l-.09.06c-.22.14-2.2 1.28-2.18 3.81.03 3.02 2.65 4.03 2.68 4.04l-.05.27zM13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-      </svg>
-      <div class="store-label">
-        <span class="store-sub">Download on the</span>
-        <span class="store-name">App Store</span>
+  <!-- For Riders section within How It Works -->
+  <section style="background: var(--sand); border-radius: 0;">
+    <div style="max-width: 700px; margin: 0 auto; text-align: center;">
+      <div class="section-tag" data-en="For Riders" data-ar="للسائقين">For Riders</div>
+      <h2 class="section-title" data-en="Ride with Wasel. Earn on your terms." data-ar="اركب مع واصل. اكسب بشروطك.">Ride with Wasel. Earn on your terms.</h2>
+      <p class="section-sub centered" data-en="Join hundreds of independent riders across Riyadh who choose when to work, how much to earn, and grow with every delivery." data-ar="انضم لمئات السائقين المستقلين في الرياض الذين يختارون وقت العمل وحجم الكسب مع كل توصيلة.">Join hundreds of independent riders across Riyadh who choose when to work, how much to earn, and grow with every delivery.</p>
+      <div style="display:flex; gap:16px; flex-wrap:wrap; justify-content:center; margin-bottom:32px;">
+        <div class="feature-card" style="max-width:200px; text-align:center;">
+          <div class="feature-icon" style="margin:0 auto 12px;">🕐</div>
+          <h3 data-en="Flexible hours" data-ar="ساعات مرنة">Flexible hours</h3>
+        </div>
+        <div class="feature-card" style="max-width:200px; text-align:center;">
+          <div class="feature-icon" style="margin:0 auto 12px;">💰</div>
+          <h3 data-en="Earn per delivery" data-ar="اكسب لكل توصيلة">Earn per delivery</h3>
+        </div>
+        <div class="feature-card" style="max-width:200px; text-align:center;">
+          <div class="feature-icon" style="margin:0 auto 12px;">📱</div>
+          <h3 data-en="Easy rider app" data-ar="تطبيق سهل للسائق">Easy rider app</h3>
+        </div>
       </div>
-    </a>
-    <a href="#" class="btn-store light">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-        <path d="M3.18 1.09C2.77 1.52 2.5 2.18 2.5 3.04v17.92c0 .86.27 1.52.69 1.94l.1.1L13.43 12.5v-.28L3.28.99l-.1.1z" fill="white"/>
-        <path d="M17.12 16.19l-3.69-3.69v-.28l3.69-3.69.08.05 4.37 2.48c1.25.71 1.25 1.87 0 2.58l-4.37 2.48-.08.07z" fill="white"/>
-        <path d="M17.2 16.12L13.43 12.5 3.18 22.9c.41.44 1.09.49 1.86.05l12.16-6.83" fill="white"/>
-        <path d="M17.2 7.88L5.04 1.05C4.27.61 3.59.66 3.18 1.1L13.43 11.5l3.77-3.62z" fill="white"/>
-      </svg>
-      <div class="store-label">
-        <span class="store-sub">Get it on</span>
-        <span class="store-name">Google Play</span>
-      </div>
-    </a>
-  </div>
-</section>
+      <a class="btn-primary" href="#" style="display:inline-flex;" data-en="Become a Rider" data-ar="انضم كسائق">Become a Rider →</a>
+    </div>
+  </section>
 
-<!-- Contact -->
-<section class="contact-section" id="contact">
-  <div class="contact-left">
-    <div class="section-eyebrow">Contact</div>
-    <div class="section-title">Get in touch.</div>
-    <p class="section-sub" style="margin-bottom:0;">Questions, partnerships, or support — reach out and we'll get back to you.</p>
-  </div>
-  <div class="contact-right">
-    <div class="contact-item">
-      <div class="contact-icon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-          <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="#0A5C4A"/>
+  <div class="cta-band">
+    <h2 data-en="Try it for yourself." data-ar="جرّبه بنفسك.">Try it for yourself.</h2>
+    <p data-en="Download the app and place your first order in under 2 minutes." data-ar="حمّل التطبيق وأرسل طلبك الأول في أقل من دقيقتين.">Download the app and place your first order in under 2 minutes.</p>
+    <div class="store-badges">
+      <a class="store-badge" href="#">
+         <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+          <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98l-.09.06c-.22.14-2.2 1.28-2.18 3.81.03 3.02 2.65 4.03 2.68 4.04l-.05.27zM13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
         </svg>
-      </div>
-      <div>
-        <h4>Email</h4>
-        <a href="mailto:faisalzafar52@gmail.com">faisalzafar52@gmail.com</a>
-      </div>
-    </div>
-    <div class="contact-item">
-      <div class="contact-icon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#0A5C4A"/>
-        </svg>
-      </div>
-      <div>
-        <h4>Location</h4>
-        <p>Riyadh, Saudi Arabia</p>
-      </div>
-    </div>
-    <div class="contact-item">
-      <div class="contact-icon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-          <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 4.18l5 2.23V11c0 3.35-2.31 6.48-5 7.53-2.69-1.05-5-4.18-5-7.53V7.41l5-2.23z" fill="#0A5C4A"/>
-        </svg>
-      </div>
-      <div>
-        <h4>Privacy</h4>
-        <a href="privacy.html">Privacy Policy</a>
-      </div>
+        <span class="store-label"><small data-en="Download on the" data-ar="حمّل من">Download on the</small><span>App Store</span></span>
+      </a>
+      <a class="store-badge" href="#">
+        <span class="store-icon">▶</span>
+        <span class="store-label"><small data-en="Get it on" data-ar="احصل عليه من">Get it on</small><span>Google Play</span></span>
+      </a>
     </div>
   </div>
-</section>
+</div><!-- /how -->
 
+<!-- ═══════════════ CONTACT ═══════════════ -->
+<div class="page" id="page-contact">
+  <div class="contact-hero">
+    <h1 data-en="Let's talk." data-ar="لنتحدث.">Let's talk.</h1>
+    <p data-en="Questions, partnerships, or just want to say hello — we're here and happy to help." data-ar="أسئلة، شراكات، أو مجرد تحية — نحن هنا ويسعدنا المساعدة.">Questions, partnerships, or just want to say hello — we're here and happy to help.</p>
+  </div>
+  <div class="contact-body">
+    <div class="contact-info">
+      <h2 data-en="Get in touch" data-ar="تواصل معنا">Get in touch</h2>
+      <p class="sub" data-en="Reach out through the form or use any of the details below. We typically respond within one business day." data-ar="تواصل عبر النموذج أو باستخدام أي من التفاصيل أدناه. نرد عادةً في يوم عمل واحد.">Reach out through the form or use any of the details below. We typically respond within one business day.</p>
+      <div class="contact-items">
+        <div class="ci">
+          <div class="ci-icon">📧</div>
+          <div>
+            <div class="ci-label" data-en="Email" data-ar="البريد الإلكتروني">Email</div>
+            <div class="ci-val">hello@thewasel.com</div>
+          </div>
+        </div>
+        <div class="ci">
+          <div class="ci-icon">📍</div>
+          <div>
+            <div class="ci-label" data-en="Location" data-ar="الموقع">Location</div>
+            <div class="ci-val" data-en="Riyadh, Saudi Arabia" data-ar="الرياض، المملكة العربية السعودية">Riyadh, Saudi Arabia</div>
+          </div>
+        </div>
+        <div class="ci">
+          <div class="ci-icon">🌐</div>
+          <div>
+            <div class="ci-label" data-en="Website" data-ar="الموقع الإلكتروني">Website</div>
+            <div class="ci-val">thewasel.com</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="contact-form">
+      <div id="contact-form-wrap">
+        <div class="form-row">
+          <div class="form-group">
+            <label data-en="First Name" data-ar="الاسم الأول">First Name</label>
+            <input type="text" placeholder="Ahmed" />
+          </div>
+          <div class="form-group">
+            <label data-en="Last Name" data-ar="اسم العائلة">Last Name</label>
+            <input type="text" placeholder="Al-Rashid" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label data-en="Email Address" data-ar="البريد الإلكتروني">Email Address</label>
+          <input type="email" placeholder="you@example.com" />
+        </div>
+        <div class="form-group">
+          <label data-en="Subject" data-ar="الموضوع">Subject</label>
+          <select>
+            <option data-en="General Inquiry" data-ar="استفسار عام">General Inquiry</option>
+            <option data-en="Business Partnership" data-ar="شراكة تجارية">Business Partnership</option>
+            <option data-en="Rider Application" data-ar="طلب انضمام سائق">Rider Application</option>
+            <option data-en="Technical Support" data-ar="الدعم الفني">Technical Support</option>
+            <option data-en="Press / Media" data-ar="الصحافة والإعلام">Press / Media</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label data-en="Message" data-ar="الرسالة">Message</label>
+          <textarea placeholder="Tell us how we can help..." id="msg-placeholder"></textarea>
+        </div>
+        <button class="btn-primary" onclick="submitForm()" style="width:100%; justify-content:center;" data-en="Send Message →" data-ar="إرسال الرسالة →">Send Message →</button>
+      </div>
+      <div class="form-success" id="form-success">
+        <div style="font-size:2.5rem; margin-bottom:12px;">✅</div>
+        <h3 data-en="Message sent!" data-ar="تم الإرسال!">Message sent!</h3>
+        <p style="color:var(--gray); font-size:0.9rem; margin-top:8px;" data-en="Thanks for reaching out. We'll get back to you within one business day." data-ar="شكراً للتواصل. سنرد عليك خلال يوم عمل واحد.">Thanks for reaching out. We'll get back to you within one business day.</p>
+      </div>
+    </div>
+  </div>
+</div><!-- /contact -->
+
+<!-- FOOTER -->
 <footer>
-  <span>© 2026 Wasel. All rights reserved.</span>
-  <a href="privacy.html">Privacy Policy</a>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <div class="logo">
+        <div class="logo-mark" style="background:white; color:var(--green);">و</div>
+        <span>Wasel</span>
+      </div>
+      <p data-en="Same-day delivery connecting Riyadh, one package at a time." data-ar="توصيل في نفس اليوم يربط الرياض، طلباً بطلب.">Same-day delivery connecting Riyadh, one package at a time.</p>
+    </div>
+    <div class="footer-links">
+      <h4 data-en="Pages" data-ar="الصفحات">Pages</h4>
+      <ul>
+        <li><a onclick="showPage('home')" data-en="Home" data-ar="الرئيسية">Home</a></li>
+        <li><a onclick="showPage('about')" data-en="About" data-ar="عن واصل">About</a></li>
+        <li><a onclick="showPage('how')" data-en="How It Works" data-ar="كيف يعمل">How It Works</a></li>
+        <li><a onclick="showPage('contact')" data-en="Contact" data-ar="تواصل معنا">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-links">
+      <h4 data-en="Legal" data-ar="القانونية">Legal</h4>
+      <ul>
+        <li><a href="https://www.thewasel.com" target="_blank" data-en="Privacy Policy" data-ar="سياسة الخصوصية">Privacy Policy</a></li>
+        <li><a href="https://www.thewasel.com" target="_blank" data-en="Terms of Service" data-ar="شروط الخدمة">Terms of Service</a></li>
+      </ul>
+    </div>
+    <div class="footer-links">
+      <h4 data-en="Download" data-ar="تحميل">Download</h4>
+      <ul>
+        <li><a href="#" data-en="App Store" data-ar="متجر آبل">App Store</a></li>
+        <li><a href="#" data-en="Google Play" data-ar="جوجل بلاي">Google Play</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span data-en="© 2025 Wasel. All rights reserved." data-ar="© 2025 واصل. جميع الحقوق محفوظة.">© 2025 Wasel. All rights reserved.</span>
+    <span data-en="Riyadh, Saudi Arabia 🇸🇦" data-ar="الرياض، المملكة العربية السعودية 🇸🇦">Riyadh, Saudi Arabia 🇸🇦</span>
+  </div>
 </footer>
 
+<script>
+  let currentLang = 'en';
+  let currentPage = 'home';
+
+  function showPage(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + page).classList.add('active');
+    document.querySelectorAll('#nav-links a').forEach(a => {
+      a.classList.toggle('active', a.dataset.page === page);
+    });
+    currentPage = page;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function toggleLang() {
+    currentLang = currentLang === 'en' ? 'ar' : 'en';
+    document.body.classList.toggle('ar', currentLang === 'ar');
+    document.documentElement.setAttribute('lang', currentLang);
+    document.documentElement.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
+    document.getElementById('lang-toggle').textContent = currentLang === 'en' ? 'عربي' : 'English';
+    applyTranslations();
+  }
+
+  function applyTranslations() {
+    document.querySelectorAll('[data-en]').forEach(el => {
+      const val = el.dataset[currentLang];
+      if (!val) return;
+      if (el.tagName === 'INPUT' && el.type === 'text') { el.placeholder = val; return; }
+      if (el.tagName === 'TEXTAREA') { el.placeholder = val; return; }
+      if (el.tagName === 'OPTION') { el.textContent = val; return; }
+      el.innerHTML = val;
+    });
+    // contact textarea placeholder
+    const ta = document.querySelector('textarea');
+    if (ta) ta.placeholder = currentLang === 'ar' ? 'أخبرنا كيف يمكننا المساعدة...' : 'Tell us how we can help...';
+  }
+
+  function selectStep(idx) {
+    document.querySelectorAll('.step').forEach((s, i) => {
+      s.classList.toggle('active', i === idx);
+      s.classList.toggle('dim', i !== idx);
+    });
+    document.querySelectorAll('.step-visual-content').forEach((v, i) => {
+      v.classList.toggle('active', i === idx);
+    });
+  }
+
+  function submitForm() {
+    document.getElementById('contact-form-wrap').style.display = 'none';
+    document.getElementById('form-success').style.display = 'block';
+  }
+
+  // Nav scroll effect
+  window.addEventListener('scroll', () => {
+    document.getElementById('main-nav').classList.toggle('scrolled', window.scrollY > 10);
+  });
+
+  // Set first nav link active
+  document.querySelector('#nav-links a[data-page="home"]').classList.add('active');
+</script>
 </body>
 </html>
