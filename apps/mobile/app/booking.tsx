@@ -306,7 +306,7 @@ export default function BookingScreen() {
               </View>
             </View>
 
-            <Label>{t("destinationLabel")}</Label>
+            <Label>{t("dropoffLabel")}</Label>
             <Text style={{ color: dropoffPoint ? colors.charcoal : colors.gray, lineHeight: 22, textAlign: isRtl ? "right" : "left" }}>
               {dropoffPoint ? dropoffPoint.address : t("dropoffSelectionHint")}
             </Text>
